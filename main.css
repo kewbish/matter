@@ -36,3 +36,36 @@ html {
     font-family: Montserrat, sans-serif;
     font-size: 1.2em;
 }
+.index {
+    background: linear-gradient(#1E1E1E88, #1E1E1E88), url("https://kewbi.sh/Back2.svg") left no-repeat, url("https://kewbi.sh/Back1.svg") right no-repeat;
+}
+p {
+    margin: 0.4% 0;
+    padding: 0.2% 0;
+    line-height: 1.4em;
+}
+a {
+    color: white;
+    text-decoration: underline var(--accent-colour);
+    -webkit-text-decoration: underline var(--accent-colour)
+}
+a:hover {
+    color: var(--accent-colour);
+    transition: 0.3s;
+}
+.subtitle {
+    font-size: 4.3em;
+    margin: 1% 0 1% -1%;
+}
+.h2 {
+    font-size: 3em;
+    margin-top: 1%;
+}
+.element {
+    background-color: var(--sub-colour);
+    padding: 2% 3.5%;
+    border-radius: 7px;
+}
+.element p {
+    font-size: 0.8em;
+}
