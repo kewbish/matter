@@ -4,7 +4,7 @@ const FEEDS = [
 
 const main = document.querySelector(".grid");
 const article = document.querySelector("#m-item");
-var feed_dates = {}
+var feeds = []
 
 function addItem(ln, title, desc) {
     var clone = article.content.cloneNode(true);
@@ -18,11 +18,31 @@ function parseFeed(feed) {
     fetch(feed, { method: "GET" })
         .then(text => text.text())
         .then(texml => {
-            const rss = new DOMParser().parseFromString(texml, 'text/xml');
-            const items = rss.querySelectorAll("item");
-            console.log(items);
+            const xml = new DOMParser().parseFromString(texml, 'text/xml');
+            const map = (c, f) => Array.prototype.slice.call(c, 0).map(f);
+            const tag = (item, name) =>
+              (item.getElementsByTagName(name)[0] || {}).textContent;
+            switch (xml.documentElement.nodeName) {
+              case 'rss':
+                feeds = map(xml.documentElement.getElementsByTagName('item'), item => ({
+                  link: tag(item, 'link'),
+                  title: tag(item, 'title'),
+                  desc: tag(item, 'description'),
+                  date: new Date(tag(item, 'pubDate')),
+                }));
+                console.log(feeds);
+                break;
+              case 'feed':
+                feeds = map(xml.documentElement.getElementsByTagName('entry'), item => ({
+                  link: tag(item, 'link[rel]'),
+                  title: tag(item, 'title'),
+                  desc: tag(item, 'updated'),
+                  date: new Date(tag(item, 'updated')),
+                }));
+                console.log(feeds);
+                break;
+            }
         });
-        
 }
 
 addItem("https://kewbi.sh", "A main page", "A description for said main page");
