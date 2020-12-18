@@ -4,7 +4,7 @@ const FEEDS = [
 
 const main = document.querySelector(".grid");
 const article = document.querySelector("#m-item");
-var feeds = []
+var feeds = [];
 
 function addItem(ln, title, desc) {
     var clone = article.content.cloneNode(true);
@@ -12,6 +12,14 @@ function addItem(ln, title, desc) {
     clone.querySelector("h2").innerText = title;
     clone.querySelector("p").innerText = desc;
     main.appendChild(clone);
+}
+
+function rerender() {
+    main.innerHTML = "";
+    feeds = feeds.slice().sort((a, b) => b.date - a.date);
+    feeds.forEach(item => {
+        addItem(item.link, item.title, item.desc);
+    });
 }
 
 function parseFeed(feed) {
@@ -24,29 +32,26 @@ function parseFeed(feed) {
               (item.getElementsByTagName(name)[0] || {}).textContent;
             switch (xml.documentElement.nodeName) {
               case 'rss':
-                feeds = map(xml.documentElement.getElementsByTagName('item'), item => ({
+                feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('item'), item => ({
                   link: tag(item, 'link'),
                   title: tag(item, 'title'),
                   desc: tag(item, 'description'),
                   date: new Date(tag(item, 'pubDate')),
-                }));
+                })));
+                rerender();
                 return;
               case 'feed':
-                feeds = map(xml.documentElement.getElementsByTagName('entry'), item => ({
+                feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('entry'), item => ({
                   link: tag(item, 'link[rel]'),
                   title: tag(item, 'title'),
                   desc: tag(item, 'updated'),
                   date: new Date(tag(item, 'updated')),
-                }));
+                })));
+                rerender();
                 return;
             }
         });
 }
 
-parseFeed('https://kewbi.sh/blog/index.xml').then(() => {
-    feeds = feeds.sort((a, b) => b.date - a.date);
-    feeds.forEach(item => {
-        addItem(item.link, item.title, item.desc);
-    });
-});
+parseFeed('https://kewbi.sh/blog/index.xml');
 
