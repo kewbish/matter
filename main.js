@@ -10,7 +10,7 @@ function addItem(ln, title, desc) {
     var clone = article.content.cloneNode(true);
     clone.querySelector("a").href = ln;
     clone.querySelector("h2").innerText = title;
-    clone.querySelector("p").innerText = `${desc}`;
+    clone.querySelector("p").innerText = desc;
     main.appendChild(clone);
 }
 
@@ -30,8 +30,7 @@ function parseFeed(feed) {
                   desc: tag(item, 'description'),
                   date: new Date(tag(item, 'pubDate')),
                 }));
-                console.log(feeds);
-                break;
+                return;
               case 'feed':
                 feeds = map(xml.documentElement.getElementsByTagName('entry'), item => ({
                   link: tag(item, 'link[rel]'),
@@ -39,13 +38,15 @@ function parseFeed(feed) {
                   desc: tag(item, 'updated'),
                   date: new Date(tag(item, 'updated')),
                 }));
-                console.log(feeds);
-                break;
+                return;
             }
         });
 }
 
-addItem("https://kewbi.sh", "A main page", "A description for said main page");
-
-parseFeed('https://kewbi.sh/blog/index.xml');
+parseFeed('https://kewbi.sh/blog/index.xml').then(() => {
+    feeds = feeds.sort((a, b) => b.date - a.date);
+    feeds.forEach(item => {
+        addItem(item.link, item.title, item.desc);
+    });
+});
 
