@@ -1,5 +1,6 @@
-const FEEDS = [
+const RSSES = [
     'https://kewbi.sh/blog/index.xml',
+    'https://jvns.ca/atom.xml'
 ];
 
 const main = document.querySelector(".grid");
@@ -23,7 +24,7 @@ function rerender() {
 }
 
 function parseFeed(feed) {
-    fetch(feed, { method: "GET" })
+    fetch(`https://cors-anywhere.herokuapp.com/${feed}`, { method: "GET", headers: { "X-Requested-With": "https://kewbi.sh/matter/" } })
         .then(text => text.text())
         .then(texml => {
             const xml = new DOMParser().parseFromString(texml, 'text/xml');
@@ -53,5 +54,7 @@ function parseFeed(feed) {
         });
 }
 
-parseFeed('https://kewbi.sh/blog/index.xml');
+RSSES.forEach(rss => {
+    parseFeed(rss);
+});
 
