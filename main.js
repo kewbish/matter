@@ -1,7 +1,4 @@
-const RSSES = [
-    'https://kewbi.sh/blog/index.xml',
-    'https://jvns.ca/atom.xml'
-];
+const RSSES = atob(window.location.hash.substring(1)).split(",") || ["https://kewbi.sh/blog/index.xml"];
 
 const main = document.querySelector(".grid");
 const article = document.querySelector("#m-item");
@@ -12,7 +9,7 @@ function addItem(ln, title, desc) {
     clone.querySelector("a").href = ln;
     clone.querySelector("h2").innerText = title;
     if (desc) {
-        clone.querySelector("p").innerText = desc;
+        clone.querySelector("p").innerHTML = desc;
     }
     main.appendChild(clone);
 }
@@ -37,8 +34,8 @@ function parseFeed(feed) {
               case 'rss':
                 feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('item'), item => ({
                   link: tag(item, 'link'),
-                  title: tag(item, 'title'),
-                  desc: tag(item, 'description'),
+                  title: tag(item, 'title').slice(0, 100),
+                  desc: tag(item, 'description').slice(0, 150).replace(/(<([^>]+)>)/gi, ""),
                   date: new Date(tag(item, 'pubDate')),
                 })));
                 rerender();
