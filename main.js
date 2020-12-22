@@ -11,7 +11,9 @@ function addItem(ln, title, desc) {
     var clone = article.content.cloneNode(true);
     clone.querySelector("a").href = ln;
     clone.querySelector("h2").innerText = title;
-    clone.querySelector("p").innerText = desc;
+    if (desc) {
+        clone.querySelector("p").innerText = desc;
+    }
     main.appendChild(clone);
 }
 
@@ -28,7 +30,7 @@ function parseFeed(feed) {
         .then(text => text.text())
         .then(texml => {
             const xml = new DOMParser().parseFromString(texml, 'text/xml');
-            const map = (c, f) => Array.prototype.slice.call(c, 0).map(f);
+            const map = (c, f) => Array.prototype.slice.call(c, 0, 10).map(f);
             const tag = (item, name) =>
               (item.getElementsByTagName(name)[0] || {}).textContent;
             switch (xml.documentElement.nodeName) {
@@ -43,9 +45,9 @@ function parseFeed(feed) {
                 return;
               case 'feed':
                 feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('entry'), item => ({
-                  link: tag(item, 'link[rel]'),
+                  link: tag(item, 'link[href]'),
                   title: tag(item, 'title'),
-                  desc: tag(item, 'updated'),
+                  desc: tag(item, 'summary'),
                   date: new Date(tag(item, 'updated')),
                 })));
                 rerender();
