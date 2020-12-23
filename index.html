@@ -14,6 +14,11 @@
         <div class="m-matter">
             <h1 class="subtitle">Matter</h1>
             <p>A RSS-based content consumption tool. Hyper-personalized.</p>
+            <details>
+                <summary>Edit sources</summary>
+                <p>Type your comma separated list of sources below.</p>
+                <input type="text" id="sources" onchange="toURL(this.value);">
+            </details>
             <hr>
             <div class="grid"></div>
             <template id='m-item'>

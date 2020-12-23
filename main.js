@@ -1,8 +1,18 @@
-const RSSES = atob(window.location.hash.substring(1)).split(",") || ["https://kewbi.sh/blog/index.xml"];
+const RSSES = (atob(window.location.hash.substring(1)) || "https://kewbi.sh/blog/index.xml").split(",");
+
+document.getElementById("sources").value = RSSES;
+toURL(RSSES);
 
 const main = document.querySelector(".grid");
 const article = document.querySelector("#m-item");
 var feeds = [];
+
+function toURL(val) {
+    window.location.hash = btoa(val);
+    if (document.getElementById("sources").value != atob(window.location.hash.substring(1))) {
+        window.location.href = window.location.href;
+    }
+}
 
 function addItem(ln, title, desc) {
     var clone = article.content.cloneNode(true);
@@ -56,4 +66,3 @@ function parseFeed(feed) {
 RSSES.forEach(rss => {
     parseFeed(rss);
 });
-
