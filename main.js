@@ -8,9 +8,9 @@ const article = document.querySelector("#m-item");
 var feeds = [];
 
 function toURL(val) {
-    window.location.hash = btoa(val);
     if (document.getElementById("sources").value != atob(window.location.hash.substring(1))) {
-        window.location.href = window.location.href;
+        window.location.hash = btoa(val);
+        window.location.reload();
     }
 }
 
