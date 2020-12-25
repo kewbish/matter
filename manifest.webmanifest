@@ -1,0 +1,22 @@
+{
+  "short_name": "Matter",
+  "name": "Matter - Kewbish",
+  "description": "A minimal RSS reader.",
+  "icons": [
+    {
+      "src": "assets/matter192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "assets/matter512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#1e1e1e",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#1e1e1e"
+}
