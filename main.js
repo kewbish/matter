@@ -66,3 +66,5 @@ function parseFeed(feed) {
 RSSES.forEach(rss => {
     parseFeed(rss);
 });
+
+navigator.serviceWorker.register('sw.js');
