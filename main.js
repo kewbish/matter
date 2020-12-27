@@ -14,6 +14,12 @@ function toURL(val) {
     }
 }
 
+function setPAT(val) {
+    if (document.getElementById("pat")) {
+        localStorage.setItem("pat", val);
+    }
+}
+
 function addItem(ln, title, desc) {
     var clone = article.content.cloneNode(true);
     clone.querySelector("a").href = ln;
