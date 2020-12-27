@@ -23,8 +23,13 @@
                     <p>Type your comma separated list of sources below.</p>
                     <input type="text" id="sources" onchange="toURL(this.value);">
                 </details>
-                <p>GitHub PAT:</p>
-                <input type="password" id="pat" onchange="setPAT(this.value)">
+                <details>
+                    <summary>GitHub PAT Setting</summary>
+                    <p>GitHub PAT:</p>
+                    <input type="password" id="pat" onchange="setPAT(this.value)">
+                </details>
+                <p>New URL to bookmark:</p>
+                <input type="text" id="newurl" onchange="saveNew(this.value)">
             </details>
             <hr>
             <div class="grid"></div>

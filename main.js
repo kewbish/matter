@@ -1,4 +1,6 @@
 const RSSES = (atob(window.location.hash.substring(1)) || "https://kewbi.sh/blog/index.xml").split(",");
+const REPO = "kewbish/evb";
+const NUM = 1;
 
 document.getElementById("sources").value = RSSES;
 toURL(RSSES);
@@ -18,6 +20,18 @@ function setPAT(val) {
     if (document.getElementById("pat")) {
         localStorage.setItem("pat", val);
     }
+}
+
+function saveNew(val) {
+    pat = localStorage.getItem("pat");
+    if (pat == null) {
+        console.error("No PAT.");
+        return;
+    }
+    fetch(`https://api.github.com/repos/${REPO}/issues/${NUM}/comments`, { method: "POST", headers: {"Authorization": `Bearer ${pat}`}, body: JSON.stringify({"body": val}) })
+    .catch(err => {
+        console.error("Matter - ", err);
+    });
 }
 
 function addItem(ln, title, desc) {
