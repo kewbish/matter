@@ -19,14 +19,22 @@
             <details>
                 <summary>Advanced</summary>
                 <details>
+                    <hr>
                     <summary>Edit sources</summary>
                     <p>Type your comma separated list of sources below.</p>
                     <input type="text" id="sources" onchange="toURL(this.value);">
+                    <hr>
                 </details>
                 <details>
-                    <summary>GitHub PAT Setting</summary>
+                    <summary>GitHub Settings</summary>
+                    <hr>
                     <p>GitHub PAT:</p>
-                    <input type="password" id="pat" onchange="setPAT(this.value)">
+                    <input type="password" id="pat" onchange="setLoc(this.value, 'pat')">
+                    <p>Repo (format: user/reponame):</p>
+                    <input type="text" id="repo" onchange="setLoc(this.value, 'repo')">
+                    <p>Issue #:</p>
+                    <input type="number" id="isnum" onchange="setLoc(this.value, 'isnum')">
+                    <hr>
                 </details>
                 <p>New URL to bookmark:</p>
                 <input type="text" id="newurl" onchange="saveNew(this.value)">

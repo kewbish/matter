@@ -1,8 +1,10 @@
 const RSSES = (atob(window.location.hash.substring(1)) || "https://kewbi.sh/blog/index.xml").split(",");
-const REPO = "kewbish/evb";
-const NUM = 1;
 
 document.getElementById("sources").value = RSSES;
+document.getElementById("pat").value = localStorage.getItem("pat");
+document.getElementById("repo").value = localStorage.getItem("repo");
+document.getElementById("isnum").value = localStorage.getItem("isnum");
+
 toURL(RSSES);
 
 const main = document.querySelector(".grid");
@@ -16,19 +18,21 @@ function toURL(val) {
     }
 }
 
-function setPAT(val) {
-    if (document.getElementById("pat")) {
-        localStorage.setItem("pat", val);
+function setLoc(val, name) {
+    if (document.getElementById(name)) {
+        localStorage.setItem(name, val);
     }
 }
 
 function saveNew(val) {
     pat = localStorage.getItem("pat");
-    if (pat == null) {
-        console.error("No PAT.");
+    repo = localStorage.getItem("repo");
+    isnum = localStorage.getItem("isnum");
+    if (pat == null || repo == null || isnum == null) {
+        console.error("Fill out all of [pat, repo, issue number].");
         return;
     }
-    fetch(`https://api.github.com/repos/${REPO}/issues/${NUM}/comments`, { method: "POST", headers: {"Authorization": `Bearer ${pat}`}, body: JSON.stringify({"body": val}) })
+    fetch(`https://api.github.com/repos/${repo}/issues/${isnum}/comments`, { method: "POST", headers: {"Authorization": `Bearer ${pat}`}, body: JSON.stringify({"body": val}) })
     .catch(err => {
         console.error("Matter - ", err);
     });
