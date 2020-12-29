@@ -38,6 +38,23 @@ function saveNew(val) {
     });
 }
 
+function getBm() {
+    pat = localStorage.getItem("pat");
+    repo = localStorage.getItem("repo");
+    isnum = localStorage.getItem("isnum");
+    fetch(`https://api.github.com/repos/${repo}/issues/${isnum}/comments`, { method: "GET", headers: {"Authorization": `Bearer ${pat}`}})
+    .then(res => res.json())
+    .then(jsn => {
+        var links = [];
+        jsn.forEach(itm => links.push({link: itm.body, title: itm.body.replace("https://", ""), date: new Date()}));
+        feeds = feeds.concat(links);
+        rerender(false);
+    })
+    .catch(err => {
+        console.error("Matter - ", err);
+    });
+}
+
 function addItem(ln, title, desc) {
     var clone = article.content.cloneNode(true);
     clone.querySelector("a").href = ln;
@@ -48,9 +65,11 @@ function addItem(ln, title, desc) {
     main.appendChild(clone);
 }
 
-function rerender() {
+function rerender(sort) {
     main.innerHTML = "";
-    feeds = feeds.slice().sort((a, b) => b.date - a.date);
+    if (sort == true) {
+        feeds = feeds.slice().sort((a, b) => b.date - a.date);
+    }
     feeds.forEach(item => {
         addItem(item.link, item.title, item.desc);
     });
@@ -72,7 +91,7 @@ function parseFeed(feed) {
                   desc: tag(item, 'description').slice(0, 150).replace(/(<([^>]+)>)/gi, ""),
                   date: new Date(tag(item, 'pubDate')),
                 })));
-                rerender();
+                rerender(true);
                 return;
               case 'feed':
                 feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('entry'), item => ({
@@ -81,12 +100,13 @@ function parseFeed(feed) {
                   desc: tag(item, 'summary'),
                   date: new Date(tag(item, 'updated')),
                 })));
-                rerender();
+                rerender(true);
                 return;
             }
         });
 }
 
+getBm();
 RSSES.forEach(rss => {
     parseFeed(rss);
 });
