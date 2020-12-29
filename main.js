@@ -1,11 +1,10 @@
 const RSSES = (atob(window.location.hash.substring(1)) || "https://kewbi.sh/blog/index.xml").split(",");
+toURL(RSSES);
 
 document.getElementById("sources").value = RSSES;
 document.getElementById("pat").value = localStorage.getItem("pat");
 document.getElementById("repo").value = localStorage.getItem("repo");
 document.getElementById("isnum").value = localStorage.getItem("isnum");
-
-toURL(RSSES);
 
 const main = document.querySelector(".grid");
 const article = document.querySelector("#m-item");
@@ -46,9 +45,9 @@ function getBm() {
     .then(res => res.json())
     .then(jsn => {
         var links = [];
-        jsn.forEach(itm => links.push({link: itm.body, title: itm.body.replace("https://", ""), date: new Date()}));
+        jsn.forEach(itm => links.push({link: itm.body, title: itm.body.replace("https://", "").split(",")[0], desc: itm.body.split(",")[1], date: new Date()}));
         feeds = feeds.concat(links);
-        rerender(false);
+        rerender();
     })
     .catch(err => {
         console.error("Matter - ", err);
@@ -65,11 +64,9 @@ function addItem(ln, title, desc) {
     main.appendChild(clone);
 }
 
-function rerender(sort) {
+function rerender() {
     main.innerHTML = "";
-    if (sort == true) {
-        feeds = feeds.slice().sort((a, b) => b.date - a.date);
-    }
+    feeds = feeds.slice().sort((a, b) => b.date - a.date);
     feeds.forEach(item => {
         addItem(item.link, item.title, item.desc);
     });
@@ -88,10 +85,10 @@ function parseFeed(feed) {
                 feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('item'), item => ({
                   link: tag(item, 'link'),
                   title: tag(item, 'title').slice(0, 100),
-                  desc: tag(item, 'description').slice(0, 150).replace(/(<([^>]+)>)/gi, ""),
+                  desc: tag(item, 'description').slice(0, 150),
                   date: new Date(tag(item, 'pubDate')),
                 })));
-                rerender(true);
+                rerender();
                 return;
               case 'feed':
                 feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('entry'), item => ({
@@ -100,7 +97,7 @@ function parseFeed(feed) {
                   desc: tag(item, 'summary'),
                   date: new Date(tag(item, 'updated')),
                 })));
-                rerender(true);
+                rerender();
                 return;
             }
         });
