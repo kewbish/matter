@@ -1,10 +1,10 @@
 const RSSES = (atob(window.location.hash.substring(1)) || "https://kewbi.sh/blog/index.xml").split(",");
-toURL(RSSES);
 
 document.getElementById("sources").value = RSSES;
 document.getElementById("pat").value = localStorage.getItem("pat");
 document.getElementById("repo").value = localStorage.getItem("repo");
 document.getElementById("isnum").value = localStorage.getItem("isnum");
+toURL(RSSES);
 
 const main = document.querySelector(".grid");
 const article = document.querySelector("#m-item");
@@ -54,12 +54,21 @@ function getBm() {
     });
 }
 
+function delItem(id) {
+    pat = localStorage.getItem("pat");
+    repo = localStorage.getItem("repo");
+    fetch(`https://api.github.com/repos/${repo}/issues/comments/${id}`, { method: "DELETE", headers: {"Authorization": `Bearer ${pat}`}})
+    .catch(err => {
+        console.error("Matter - ", err);
+    });
+}
+
 function addItem(ln, title, desc, id) {
     var clone = article.content.cloneNode(true);
     clone.querySelector("a").href = ln;
     clone.querySelector("h2").innerText = title;
     if (desc) {
-        clone.querySelector("p").innerHTML = id == null ? desc : desc + " <a onclick='delItm(id)'>delete</a>";
+        clone.querySelector("p").innerHTML = id == null ? desc : desc + " <a onclick='delItem(" + id + ")'>delete</a>";
     }
     main.appendChild(clone);
 }
