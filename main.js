@@ -45,7 +45,7 @@ function getBm() {
     .then(res => res.json())
     .then(jsn => {
         var links = [];
-        jsn.forEach(itm => links.push({link: itm.body, title: itm.body.replace("https://", "").split(",")[0], desc: itm.body.split(",")[1], date: new Date()}));
+        jsn.forEach(itm => links.push({link: itm.body, title: itm.body.replace("https://", "").split(",")[0], desc: itm.body.split(",")[1], date: new Date(), id: itm.id}));
         feeds = feeds.concat(links);
         rerender();
     })
@@ -54,12 +54,12 @@ function getBm() {
     });
 }
 
-function addItem(ln, title, desc) {
+function addItem(ln, title, desc, id) {
     var clone = article.content.cloneNode(true);
     clone.querySelector("a").href = ln;
     clone.querySelector("h2").innerText = title;
     if (desc) {
-        clone.querySelector("p").innerHTML = desc;
+        clone.querySelector("p").innerHTML = id == null ? desc : desc + " <a onclick='delItm(id)'>delete</a>";
     }
     main.appendChild(clone);
 }
@@ -68,7 +68,7 @@ function rerender() {
     main.innerHTML = "";
     feeds = feeds.slice().sort((a, b) => b.date - a.date);
     feeds.forEach(item => {
-        addItem(item.link, item.title, item.desc);
+        addItem(item.link, item.title, item.desc, item.id);
     });
 }
 
