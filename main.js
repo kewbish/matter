@@ -32,6 +32,7 @@ function saveNew(val) {
         return;
     }
     fetch(`https://api.github.com/repos/${repo}/issues/${isnum}/comments`, { method: "POST", headers: {"Authorization": `Bearer ${pat}`}, body: JSON.stringify({"body": val}) })
+    .then(() => { getBm(); rerender(); })
     .catch(err => {
         console.error("Matter - ", err);
     });
@@ -67,9 +68,8 @@ function addItem(ln, title, desc, id) {
     var clone = article.content.cloneNode(true);
     clone.querySelector("a").href = ln;
     clone.querySelector("h2").innerText = title;
-    if (desc) {
-        clone.querySelector("p").innerHTML = id == null ? desc : desc + " <a onclick='delItem(" + id + ")'>delete</a>";
-    }
+    const linkId = " <a onclick='delItem(" + id + ")'>[delete]</a>";
+    clone.querySelector("p").innerHTML = desc != null ? (id != null ? (desc + linkId) : desc) : linkId;
     main.appendChild(clone);
 }
 
