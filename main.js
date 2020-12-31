@@ -1,5 +1,6 @@
 const RSSES = (atob(window.location.hash.substring(1)) || "https://kewbi.sh/blog/index.xml").split(",");
 
+document.getElementById("er").style.display = "none";
 document.getElementById("sources").value = RSSES;
 document.getElementById("pat").value = localStorage.getItem("pat");
 document.getElementById("repo").value = localStorage.getItem("repo");
@@ -23,6 +24,12 @@ function setLoc(val, name) {
     }
 }
 
+function showEr(er) {
+    show = document.getElementById("er");
+    show.style.display = "block";
+    show.firstElementChild.innerHTML = er;
+}
+
 function saveNew(val) {
     pat = localStorage.getItem("pat");
     repo = localStorage.getItem("repo");
@@ -34,7 +41,7 @@ function saveNew(val) {
     fetch(`https://api.github.com/repos/${repo}/issues/${isnum}/comments`, { method: "POST", headers: {"Authorization": `Bearer ${pat}`}, body: JSON.stringify({"body": val}) })
     .then(() => { getBm(); rerender(); })
     .catch(err => {
-        console.error("Matter - ", err);
+        showEr(err);
     });
 }
 
@@ -59,6 +66,10 @@ function delItem(id) {
     pat = localStorage.getItem("pat");
     repo = localStorage.getItem("repo");
     fetch(`https://api.github.com/repos/${repo}/issues/comments/${id}`, { method: "DELETE", headers: {"Authorization": `Bearer ${pat}`}})
+    .then(() => {
+        feeds = feeds.filter(f => f.id != id);
+        rerender();
+    })
     .catch(err => {
         console.error("Matter - ", err);
     });
@@ -83,33 +94,35 @@ function rerender() {
 
 function parseFeed(feed) {
     fetch(`https://cors-anywhere.herokuapp.com/${feed}`, { method: "GET", headers: { "X-Requested-With": "https://kewbi.sh/matter/" } })
-        .then(text => text.text())
-        .then(texml => {
-            const xml = new DOMParser().parseFromString(texml, 'text/xml');
-            const map = (c, f) => Array.prototype.slice.call(c, 0, 10).map(f);
-            const tag = (item, name) =>
-              (item.getElementsByTagName(name)[0] || {}).textContent;
-            switch (xml.documentElement.nodeName) {
-              case 'rss':
-                feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('item'), item => ({
-                  link: tag(item, 'link'),
-                  title: tag(item, 'title').slice(0, 100),
-                  desc: tag(item, 'description').slice(0, 150),
-                  date: new Date(tag(item, 'pubDate')),
-                })));
-                rerender();
-                return;
-              case 'feed':
-                feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('entry'), item => ({
-                  link: tag(item, 'link[href]'),
-                  title: tag(item, 'title'),
-                  desc: tag(item, 'summary'),
-                  date: new Date(tag(item, 'updated')),
-                })));
-                rerender();
-                return;
-            }
-        });
+    .then(text => text.text())
+    .then(texml => {
+        const xml = new DOMParser().parseFromString(texml, 'text/xml');
+        const map = (c, f) => Array.prototype.slice.call(c, 0, 10).map(f);
+        const tag = (item, name) =>
+          (item.getElementsByTagName(name)[0] || {}).textContent;
+        switch (xml.documentElement.nodeName) {
+          case 'rss':
+            feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('item'), item => ({
+              link: tag(item, 'link'),
+              title: tag(item, 'title').slice(0, 100),
+              desc: tag(item, 'description').slice(0, 150),
+              date: new Date(tag(item, 'pubDate')),
+            })));
+            rerender();
+            return;
+          case 'feed':
+            feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('entry'), item => ({
+              link: tag(item, 'link[href]'),
+              title: tag(item, 'title'),
+              desc: tag(item, 'summary'),
+              date: new Date(tag(item, 'updated')),
+            })));
+            rerender();
+            return;
+    }})
+    .catch(err => {
+        showEr(err);
+    });
 }
 
 getBm();
