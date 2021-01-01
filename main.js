@@ -78,9 +78,10 @@ function delItem(id) {
 function addItem(ln, title, desc, id) {
     var clone = article.content.cloneNode(true);
     clone.querySelector("a").href = ln;
-    clone.querySelector("h2").innerText = title;
+    clone.querySelector("h2").innerText =  title ? (title.length > 50 ? `${title.slice(0, 50)}...` : title) : "";
     const linkId = " <a onclick='delItem(" + id + ")'>[delete]</a>";
-    clone.querySelector("p").innerHTML = desc != null ? (id != null ? (desc + linkId) : desc) : linkId;
+    var descTrun = desc ? (desc.length > 50 ? `${desc.slice(0, 50)}...` : desc) : "";
+    clone.querySelector("p").innerHTML = desc != undefined ? (id != undefined ? (descTrun + linkId) : descTrun) : (id != undefined ? linkId : "");
     main.appendChild(clone);
 }
 
@@ -104,15 +105,19 @@ function parseFeed(feed) {
           case 'rss':
             feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('item'), item => ({
               link: tag(item, 'link'),
-              title: tag(item, 'title').slice(0, 100),
-              desc: tag(item, 'description').slice(0, 150),
+              title: tag(item, 'title'),
+              desc: tag(item, 'description'),
               date: new Date(tag(item, 'pubDate')),
             })));
             rerender();
             return;
           case 'feed':
             feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('entry'), item => ({
-              link: tag(item, 'link[href]'),
+              link: map(item.getElementsByTagName('link'), link => {
+                  const rel = link.getAttribute('rel');
+                  if (!rel || rel === 'alternate') {
+                    return link.getAttribute('href');
+              }})[0],
               title: tag(item, 'title'),
               desc: tag(item, 'summary'),
               date: new Date(tag(item, 'updated')),
