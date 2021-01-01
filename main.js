@@ -53,7 +53,7 @@ function getBm() {
     .then(res => res.json())
     .then(jsn => {
         var links = [];
-        jsn.forEach(itm => links.push({link: itm.body, title: itm.body.replace("https://", "").split(",")[0], desc: itm.body.split(",")[1], date: new Date(), id: itm.id}));
+        jsn.forEach(itm => links.push({link: itm.body.split(",")[0], title: itm.body.replace("https://", "").split(",")[0], desc: itm.body.split(",")[1], date: new Date(), id: itm.id}));
         feeds = feeds.concat(links);
         rerender();
     })
@@ -93,7 +93,7 @@ function rerender() {
 }
 
 function parseFeed(feed) {
-    fetch(`https://cors-anywhere.herokuapp.com/${feed}`, { method: "GET", headers: { "X-Requested-With": "https://kewbi.sh/matter/" } })
+    fetch(`https://cors-anywhere.herokuapp.com/${feed}`, { method: "GET", headers: { "Origin": "https://kewbi.sh/matter/" } })
     .then(text => text.text())
     .then(texml => {
         const xml = new DOMParser().parseFromString(texml, 'text/xml');
