@@ -17,22 +17,8 @@ self.addEventListener('install', ins => {
 
 self.addEventListener('fetch', ins => {
   ins.respondWith(
-    fetch(ins.request)
-    .then(res => {
-        caches.open('matter')
-        .then(cache => {
-            cache.put(ins.request.url, res.clone());
-            return res;
-        })
-    })
-    .catch(() => {
-        return caches.match(event.request);
-    })
-    .then(res => {
-        if (res === undefined) {
-            return cache.match("index.html");
-        }
-        return res;
-    })
+    caches.match(ins.request).then(res => {
+      return res || fetch(ins.request);
+    }),
   );
 });
