@@ -7,6 +7,10 @@ document.getElementById("repo").value = localStorage.getItem("repo");
 document.getElementById("isnum").value = localStorage.getItem("isnum");
 toURL(RSSES);
 
+var pat = "";
+var repo = "";
+var isnum = 0;
+
 const main = document.querySelector(".grid");
 const article = document.querySelector("#m-item");
 var feeds = [];
@@ -16,6 +20,12 @@ function toURL(val) {
         window.location.hash = btoa(val);
         window.location.reload();
     }
+}
+
+function upLoc() {
+    pat = localStorage.getItem("pat");
+    repo = localStorage.getItem("repo");
+    isnum = localStorage.getItem("isnum");
 }
 
 function setLoc(val, name) {
@@ -31,9 +41,7 @@ function showEr(er) {
 }
 
 function saveNew(val) {
-    pat = localStorage.getItem("pat");
-    repo = localStorage.getItem("repo");
-    isnum = localStorage.getItem("isnum");
+    upLoc();
     if (pat == null || repo == null || isnum == null) {
         console.error("Fill out all of [pat, repo, issue number].");
         return;
@@ -50,9 +58,7 @@ function saveNew(val) {
 }
 
 function getBm() {
-    pat = localStorage.getItem("pat");
-    repo = localStorage.getItem("repo");
-    isnum = localStorage.getItem("isnum");
+    upLoc();
     fetch(`https://api.github.com/repos/${repo}/issues/${isnum}/comments`, { method: "GET", headers: {"Authorization": `Bearer ${pat}`}})
     .then(res => res.json())
     .then(jsn => {
@@ -67,8 +73,7 @@ function getBm() {
 }
 
 function delItem(id) {
-    pat = localStorage.getItem("pat");
-    repo = localStorage.getItem("repo");
+    upLoc();
     fetch(`https://api.github.com/repos/${repo}/issues/comments/${id}`, { method: "DELETE", headers: {"Authorization": `Bearer ${pat}`}})
     .then(() => {
         feeds = feeds.filter(f => f.id != id);
@@ -83,8 +88,8 @@ function addItem(ln, title, desc, id) {
     var clone = article.content.cloneNode(true);
     clone.querySelector("a").href = ln;
     clone.querySelector("h2").innerText =  title ? (title.length > 50 ? `${title.slice(0, 50)}...` : title) : "";
-    const linkId = " <a onclick='delItem(" + id + ")'>[delete]</a>";
     var descTrun = desc ? (desc.length > 50 ? `${desc.slice(0, 50)}...` : desc) : "";
+    const linkId = " <a onclick='delItem(" + id + ")'>[delete]</a>";
     clone.querySelector("p").innerHTML = desc != undefined ? (id != undefined ? (descTrun + linkId) : descTrun) : (id != undefined ? linkId : "");
     main.appendChild(clone);
 }
