@@ -24,22 +24,22 @@
                 <details>
                     <hr>
                     <summary>Edit sources</summary>
-                    <p>Type comma separated list of sources below.</p>
+                    <label for="sources">Type comma separated list of sources below.</label>
                     <input type="text" id="sources" onchange="toURL(this.value);">
                     <hr>
                 </details>
                 <details>
                     <summary>GitHub Settings</summary>
                     <hr>
-                    <p>GitHub PAT:</p>
+                    <label for="pat">GitHub PAT:</label>
                     <input type="password" id="pat" onchange="setLoc(this.value, 'pat')">
-                    <p>Repo (format: user/reponame):</p>
+                    <label for="repo">Repo (format: user/reponame):</label>
                     <input type="text" id="repo" onchange="setLoc(this.value, 'repo')">
-                    <p>Issue #:</p>
+                    <label for="isnum">Issue #:</label>
                     <input type="number" id="isnum" onchange="setLoc(this.value, 'isnum')">
                     <hr>
                 </details>
-                <p>New URL to bookmark:</p>
+                <label for="newurl">New URL to bookmark:</label>
                 <input type="text" id="newurl" onchange="saveNew(this.value)">
             </details>
             <hr>

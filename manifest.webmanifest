@@ -12,9 +12,15 @@
       "src": "assets/matter512.png",
       "type": "image/png",
       "sizes": "512x512"
+    },
+    {
+      "src": "assets/matter512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
     }
   ],
-  "start_url": "/",
+  "start_url": "index.html",
   "background_color": "#1e1e1e",
   "display": "standalone",
   "scope": "/",
