@@ -23,6 +23,5 @@
   "start_url": "index.html",
   "background_color": "#1e1e1e",
   "display": "standalone",
-  "scope": "/",
   "theme_color": "#1e1e1e"
 }

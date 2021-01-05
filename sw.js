@@ -1,6 +1,11 @@
 const files = [
     './',
     './index.html',
+    'https://kewbi.sh/css/main.css',
+    'https://fonts.googleapis.com/css2?family=Montserrat&display=swap',
+    'https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap&text=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
+    'https://kewbi.sh/Back1.svg',
+    'https://kewbi.sh/Back2.svg',
     './main.css',
     './main.js',
     'assets/matter192.png',
