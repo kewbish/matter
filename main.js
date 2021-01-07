@@ -143,5 +143,3 @@ getBm();
 RSSES.forEach(rss => {
     parseFeed(rss);
 });
-
-navigator.serviceWorker.register('sw.js');
