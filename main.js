@@ -5,15 +5,15 @@ document.getElementById("sources").value = RSSES;
 document.getElementById("pat").value = localStorage.getItem("pat");
 document.getElementById("repo").value = localStorage.getItem("repo");
 document.getElementById("isnum").value = localStorage.getItem("isnum");
-toURL(RSSES);
 
-var pat = "";
-var repo = "";
-var isnum = 0;
+toURL(RSSES);
 
 const main = document.querySelector(".grid");
 const article = document.querySelector("#m-item");
 var feeds = [];
+var pat = "";
+var repo = "";
+var isnum = 0;
 
 function toURL(val) {
     if (document.getElementById("sources").value != atob(window.location.hash.substring(1))) {
@@ -44,6 +44,7 @@ function saveNew(val) {
     upLoc();
     if (pat == null || repo == null || isnum == null) {
         console.error("Fill out all of [pat, repo, issue number].");
+        showEr("Fill out all of [pat, repo, issue number].");
         return;
     }
     fetch(`https://api.github.com/repos/${repo}/issues/${isnum}/comments`, { method: "POST", headers: {"Authorization": `Bearer ${pat}`}, body: JSON.stringify({"body": val}) })
@@ -143,3 +144,4 @@ getBm();
 RSSES.forEach(rss => {
     parseFeed(rss);
 });
+

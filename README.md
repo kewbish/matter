@@ -18,3 +18,5 @@ Also fill in the name of your private repo, as well as the issue number Matter s
 
 Under `Advanced`, a textbox to bookmark new links can be found. A comment can be added after the link (keep the https[s]:// bit) by separating the two with a comma. (something like: `https://kewbi.sh,This is a comment`)  
 New links will appear as a separate comment in the thread.
+
+You can delete bookmarks from the Matter side by clicking the delete button - this will remove the comment from the GitHub issue thread.
