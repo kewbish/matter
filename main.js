@@ -49,8 +49,8 @@ function saveNew(val) {
     }
     fetch(`https://api.github.com/repos/${repo}/issues/${isnum}/comments`, { method: "POST", headers: {"Authorization": `Bearer ${pat}`}, body: JSON.stringify({"body": val}) })
     .then(res => res.json())
-    .then(resjson => {
-        feeds = feeds.concat({link: val.split(",")[0], title: val.replace("https://", "").split(",")[0], desc: val.split(",")[1], date: new Date(), id: resjson.id});
+    .then(jsn => {
+        feeds = feeds.concat({link: val.split(",")[0], title: val.replace("https://", "").split(",")[0], desc: val.split(",")[1], date: new Date(), id: jsn.id});
         rerender();
     })
     .catch(err => {
