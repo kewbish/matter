@@ -1,4 +1,4 @@
-const RSSES = (atob(window.location.hash.substring(1)) || "https://kewbi.sh/blog/index.xml").split(",");
+const RSSES = (atob(window.location.hash.substring(1)) || JSON.parse(localStorage.getItem('rsses')) || "https://kewbi.sh/blog/index.xml").split(",");
 
 document.getElementById("er").style.display = "none";
 document.getElementById("sources").value = RSSES;
@@ -18,6 +18,7 @@ var isnum = 0;
 function toURL(val) {
     if (document.getElementById("sources").value != atob(window.location.hash.substring(1))) {
         window.location.hash = btoa(val);
+        localStorage.setItem('rsses', JSON.stringify(val));
         window.location.reload();
     }
 }
@@ -43,7 +44,6 @@ function showEr(er) {
 function saveNew(val) {
     upLoc();
     if (pat == null || repo == null || isnum == null) {
-        console.error("Fill out all of [pat, repo, issue number].");
         showEr("Fill out all of [pat, repo, issue number].");
         return;
     }
@@ -69,7 +69,7 @@ function getBm() {
         rerender();
     })
     .catch(err => {
-        console.error("Matter - ", err);
+        showEr(err);
     });
 }
 
@@ -81,7 +81,7 @@ function delItem(id) {
         rerender();
     })
     .catch(err => {
-        console.error("Matter - ", err);
+        showEr(err);
     });
 }
 
