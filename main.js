@@ -10,7 +10,7 @@ toURL(RSSES);
 
 const main = document.querySelector(".grid");
 const article = document.querySelector("#m-item");
-var feeds = [];
+var feeds = JSON.parse(localStorage.getItem("feeds")) || [];
 var pat = "";
 var repo = "";
 var isnum = 0;
@@ -101,6 +101,7 @@ function rerender() {
     feeds.forEach(item => {
         addItem(item.link, item.title, item.desc, item.id);
     });
+    localStorage.setItem('feeds', JSON.stringify(feeds));
 }
 
 function parseFeed(feed) {
@@ -140,6 +141,7 @@ function parseFeed(feed) {
     });
 }
 
+rerender();
 getBm();
 RSSES.forEach(rss => {
     parseFeed(rss);
