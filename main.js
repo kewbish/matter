@@ -1,4 +1,5 @@
-const RSSES = (atob(window.location.hash.substring(1)) || JSON.parse(localStorage.getItem('rsses')) || "https://kewbi.sh/blog/index.xml").split(",");
+const urlstring = atob(window.location.hash.substring(1)).split(",");
+const RSSES = JSON.parse(localStorage.getItem('rsses')) || urlstring.indexOf("") == -1 ? urlstring : ["https://kewbi.sh/blog/index.xml"];
 
 document.getElementById("er").style.display = "none";
 document.getElementById("sources").value = RSSES;
@@ -15,10 +16,11 @@ var pat = "";
 var repo = "";
 var isnum = 0;
 
+rerender();
+
 function toURL(val) {
-    if (document.getElementById("sources").value != atob(window.location.hash.substring(1))) {
+    if (document.getElementById("sources").value != RSSES.join(",")) {
         window.location.hash = btoa(val);
-        localStorage.setItem('rsses', JSON.stringify(val));
         window.location.reload();
     }
 }
@@ -141,7 +143,7 @@ function parseFeed(feed) {
     });
 }
 
-rerender();
+feeds = [];
 getBm();
 RSSES.forEach(rss => {
     parseFeed(rss);
