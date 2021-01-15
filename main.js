@@ -107,7 +107,8 @@ function rerender() {
 }
 
 function parseFeed(feed) {
-    fetch(`https://matter-cors.herokuapp.com/${feed}`, { method: "GET", headers: { "Origin": "https://kewbi.sh/" } })
+    // switch back when done
+    fetch(`https://cors-anywhere.herokuapp.com/${feed}`, { method: "GET", headers: { "Origin": "https://kewbi.sh/" } })
     .then(text => text.text())
     .then(texml => {
         const xml = new DOMParser().parseFromString(texml, 'text/xml');
