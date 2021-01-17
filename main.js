@@ -11,12 +11,15 @@ toURL(RSSES);
 
 const main = document.querySelector(".grid");
 const article = document.querySelector("#m-item");
+
 var feeds = JSON.parse(localStorage.getItem("feeds")) || [];
 var pat = "";
 var repo = "";
 var isnum = 0;
 
 rerender();
+drop("https://api.github.com/user/repos", "repos", "full_name");
+drop(`https://api.github.com/${localStorage.getItem('repo')}/issues`, "isnum", "id");
 
 function toURL(val) {
     if (document.getElementById("sources").value != RSSES.join(",")) {
@@ -41,6 +44,20 @@ function showEr(er) {
     show = document.getElementById("er");
     show.style.display = "block";
     show.firstElementChild.innerHTML = er;
+}
+
+function drop(url, id, prop) {
+    var dropObj = document.getElementById(id);
+    fetch(url, { headers: {"Authorization": `Bearer ${pat}`}})
+    .then(res => res.json())
+    .then(jsn => {
+        jsn.forEach(j => {
+            option = document.createElement('option');
+            option.text = j[prop];
+            option.value = j[prop];
+            dropObj.add(option);
+        });
+    });
 }
 
 function saveNew(val) {
