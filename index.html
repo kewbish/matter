@@ -41,9 +41,9 @@
                     <label for="pat">GitHub PAT:</label>
                     <input type="password" id="pat" onchange="setLoc(this.value, 'pat')">
                     <label for="repo">Repo (format: user/reponame):</label>
-                    <input type="text" id="repo" onchange="setLoc(this.value, 'repo')">
+                    <select id="repo" onchange="setLoc(this.value, 'repo')"></select>
                     <label for="isnum">Issue #:</label>
-                    <input type="number" id="isnum" onchange="setLoc(this.value, 'isnum')">
+                    <select id="isnum" onchange="setLoc(this.value, 'isnum')"></select>
                     <a href="https://github.com/login/oauth/authorize?client-id=Iv1.3f4fb1ba73a1a737" target="_blank" rel="noreferrer"><button>Log in w/ GitHub</button></a>
                     <hr>
                 </details>
