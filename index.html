@@ -42,7 +42,7 @@
                     <input type="password" id="pat" onchange="setLoc(this.value, 'pat')">
                     <label for="repo">Repo (format: user/reponame):</label>
                     <div class="m-select">
-                        <select id="repo" onchange="setLoc(this.value, 'repo')"></select>
+                        <select id="repo" onchange="setLoc(this.value, 'repo');drop(`https://api.github.com/repos/${localStorage.getItem('repo')}/issues`, 'isnum', 'number');getBm();"></select>
                         <div class="m-sel"></div>
                     </div>
                     <label for="isnum">Issue #:</label>
@@ -50,7 +50,7 @@
                         <select id="isnum" onchange="setLoc(this.value, 'isnum')"></select>
                         <div class="m-sel"></div>
                     </div>
-                    <a href="https://github.com/login/oauth/authorize?client-id=Iv1.3f4fb1ba73a1a737" target="_blank" rel="noreferrer"><button>Log in w/ GitHub</button></a>
+                    <a href="https://github.com/login/oauth/authorize?client_id=Iv1.3f4fb1ba73a1a737" target="_blank" rel="noreferrer"><button>Log in w/ GitHub</button></a>
                     <hr>
                 </details>
                 <label for="newurl">New URL to bookmark:</label>
