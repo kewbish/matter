@@ -48,16 +48,19 @@ function showEr(er) {
 
 function drop(url, id, prop) {
     upLoc();
+    console.log(url, id, prop);
     var dropObj = document.getElementById(id);
     fetch(url, { headers: {"Authorization": `Bearer ${pat}`}})
     .then(res => res.json())
     .then(jsn => {
-        jsn.forEach(j => {
-            option = document.createElement('option');
-            option.text = j[prop];
-            option.value = j[prop];
-            dropObj.add(option);
-        });
+        if (jsn) {
+            jsn.forEach(j => {
+                option = document.createElement('option');
+                option.text = j[prop];
+                option.value = j[prop];
+                dropObj.add(option);
+            });
+        }
     });
 }
 
