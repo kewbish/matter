@@ -18,8 +18,8 @@ var repo = "";
 var isnum = 0;
 
 rerender();
-drop("https://api.github.com/user/repos", "repos", "full_name");
-drop(`https://api.github.com/${localStorage.getItem('repo')}/issues`, "isnum", "id");
+drop("https://api.github.com/user/repos", "repo", "full_name");
+drop(`https://api.github.com/repos/${localStorage.getItem('repo')}/issues`, "isnum", "id");
 
 function toURL(val) {
     if (document.getElementById("sources").value != RSSES.join(",")) {
@@ -47,6 +47,7 @@ function showEr(er) {
 }
 
 function drop(url, id, prop) {
+    upLoc();
     var dropObj = document.getElementById(id);
     fetch(url, { headers: {"Authorization": `Bearer ${pat}`}})
     .then(res => res.json())
