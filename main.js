@@ -19,7 +19,7 @@ var isnum = 0;
 
 rerender();
 drop("https://api.github.com/user/repos", "repo", "full_name");
-drop(`https://api.github.com/repos/${localStorage.getItem('repo')}/issues`, "isnum", "id");
+drop(`https://api.github.com/repos/${localStorage.getItem('repo')}/issues`, "isnum", "number");
 
 function toURL(val) {
     if (document.getElementById("sources").value != RSSES.join(",")) {
