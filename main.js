@@ -15,11 +15,12 @@ const article = document.querySelector("#m-item");
 var feeds = JSON.parse(localStorage.getItem("feeds")) || [];
 var pat = "";
 var repo = "";
-var isnum = 0;
+var isnum = 1;
 
 rerender();
-drop("https://api.github.com/user/repos", "repo", "full_name");
-drop(`https://api.github.com/repos/${localStorage.getItem('repo')}/issues`, "isnum", "number");
+if (localStorage.getItem("repo") == null) {
+    drop("https://api.github.com/user/repos", "repo", "full_name");
+}
 
 function toURL(val) {
     if (document.getElementById("sources").value != RSSES.join(",")) {
@@ -48,7 +49,6 @@ function showEr(er) {
 
 function drop(url, id, prop) {
     upLoc();
-    console.log(url, id, prop);
     var dropObj = document.getElementById(id);
     fetch(url, { headers: {"Authorization": `Bearer ${pat}`}})
     .then(res => res.json())
@@ -60,6 +60,7 @@ function drop(url, id, prop) {
                 option.value = j[prop];
                 dropObj.add(option);
             });
+            dropObj.selectedIndex = 0;
         }
     });
 }
