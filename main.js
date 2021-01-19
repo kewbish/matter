@@ -74,8 +74,10 @@ function saveNew(val) {
     fetch(`https://api.github.com/repos/${repo}/issues/${isnum}/comments`, { method: "POST", headers: {"Authorization": `Bearer ${pat}`}, body: JSON.stringify({"body": val}) })
     .then(res => res.json())
     .then(jsn => {
-        feeds = feeds.concat({link: val.split(",")[0], title: val.replace("https://", "").split(",")[0], desc: val.split(",")[1], date: new Date(), id: jsn.id});
-        rerender();
+        if (jsn) {
+            feeds = feeds.concat({link: val.split(",")[0], title: val.replace("https://", "").split(",")[0], desc: val.split(",")[1], date: new Date(), id: jsn.id});
+            rerender();
+        }
     })
     .catch(err => {
         showEr(err);
@@ -87,15 +89,23 @@ function getBm() {
     fetch(`https://api.github.com/repos/${repo}/issues/${isnum}/comments`, { method: "GET", headers: {"Authorization": `Bearer ${pat}`}})
     .then(res => res.json())
     .then(jsn => {
-        var links = [];
-        jsn.forEach(itm => links.push({link: itm.body.split(",")[0], title: itm.body.replace("https://", "").split(",")[0], desc: itm.body.split(",")[1], date: new Date(), id: itm.id}));
-        feeds = feeds.concat(links);
-        rerender();
+        if (jsn) {
+            var links = [];
+            jsn.forEach(itm => links.push({link: itm.body.split(",")[0], title: itm.body.replace("https://", "").split(",")[0], desc: itm.body.split(",")[1], date: new Date(), id: itm.id}));
+            feeds = feeds.concat(links);
+            rerender();
+        }
     })
     .catch(err => {
         showEr(err);
     });
 }
+
+function delComments() {
+    upLoc();
+    feeds = feeds.filter(f => f.id == null);
+    rerender();
+};
 
 function delItem(id) {
     upLoc();
