@@ -4,8 +4,6 @@ const RSSES = JSON.parse(localStorage.getItem('rsses')) || urlstring.indexOf("")
 document.getElementById("er").style.display = "none";
 document.getElementById("sources").value = RSSES;
 document.getElementById("pat").value = localStorage.getItem("pat");
-document.getElementById("repo").value = localStorage.getItem("repo");
-document.getElementById("isnum").value = localStorage.getItem("isnum");
 
 toURL(RSSES);
 
@@ -18,9 +16,15 @@ var repo = "";
 var isnum = 1;
 
 rerender();
-if (localStorage.getItem("repo") == null) {
+
+if (localStorage.getItem("pat") != null) {
     drop("https://api.github.com/user/repos", "repo", "full_name");
+    if (localStorage.getItem("repo") != null) {
+        drop(`https://api.github.com/repos/${localStorage.getItem('repo')}/issues`, 'isnum', 'number');
+    }
 }
+document.getElementById("repo").value = localStorage.getItem("repo");
+document.getElementById("isnum").value = localStorage.getItem("isnum");
 
 function toURL(val) {
     if (document.getElementById("sources").value != RSSES.join(",")) {
@@ -60,7 +64,7 @@ function drop(url, id, prop) {
                 option.value = j[prop];
                 dropObj.add(option);
             });
-            dropObj.selectedIndex = 0;
+            dropObj.value = localStorage.getItem(id);
         }
     });
 }
@@ -177,7 +181,9 @@ function parseFeed(feed) {
 }
 
 feeds = [];
-getBm();
+if (pat && repo && isnum) {
+    getBm();
+}
 RSSES.forEach(rss => {
     parseFeed(rss);
 });
