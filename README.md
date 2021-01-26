@@ -21,3 +21,30 @@ Under `Advanced`, a textbox to bookmark new links can be found. A comment can be
 New links will appear as a separate comment in the thread.
 
 You can delete bookmarks from the Matter side by clicking the delete button - this will remove the comment from the GitHub issue thread.
+
+## Self-Hosting
+Everything is done entirely client-side, so checkout this repo and host the files on any server. (GitHub Pages will do very nicely if you fork the repo.)
+
+If you'll be heavily using this or expect many users, kindly host your own instance of [cors-anywhere](https://github.com/Rob--W/cors-anywhere) and replace the `matter-cors.herokuapp.com` [here](https://github.com/kewbish/matter/blob/master/main.js#L147).
+
+I've added a custom auth handler. The modifications I've made are below. You'll have to replace the client_id and client_secret with values of your own [GitHub App](https://github.com/settings/apps/new).
+```js
+// before the getHandler
+async function auth(location, res) {
+  fetch(`https://github.com/login/oauth/access_token?client_id=[id]&client_secret=[secret]&code=${location.query.split("=")[1]}`, { method: "POST" })
+  .then(tex => tex.text())
+  .then(rx => {
+    res.writeHead(200);
+    res.end(rx);
+  });
+}
+
+// ... then in getHandler after the 'iscorsneeded' check
+if ((location.query != null && location.query.includes('code')) && location.host === 'auth') {
+  auth(location, res);
+  return;
+}
+```
+
+Otherwise, feel free to use the instance at [kewbi.sh/matter/](https://kewbi.sh/matter).
+
