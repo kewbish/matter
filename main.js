@@ -1,11 +1,13 @@
 const urlstring = atob(window.location.hash.substring(1)).split(",");
-const RSSES = JSON.parse(localStorage.getItem('rsses')) || urlstring.indexOf("") == -1 ? urlstring : ["https://kewbi.sh/blog/index.xml"];
+const urlloc = JSON.parse(localStorage.getItem("rsses"));
+var RSSES = (urlloc && urlloc.indexOf("") == -1) || urlstring.indexOf("") == -1 ? urlstring : ["https://kewbi.sh/blog/index.xml"];
 
 document.getElementById("er").style.display = "none";
 document.getElementById("sources").value = RSSES;
 document.getElementById("pat").value = localStorage.getItem("pat");
 
 toURL(RSSES);
+setLoc("rsses", RSSES);
 
 const main = document.querySelector(".grid");
 const article = document.querySelector("#m-item");
