@@ -1,6 +1,6 @@
 const urlstring = atob(window.location.hash.substring(1)).split(",");
 const urlloc = JSON.parse(localStorage.getItem("rsses"));
-var RSSES = (urlloc && urlloc.indexOf("") == -1) || urlstring.indexOf("") == -1 ? urlstring : ["https://kewbi.sh/blog/index.xml"];
+var RSSES = (urlloc && urlloc.indexOf("") == -1) ? urlloc :(urlstring.indexOf("") == -1 ? urlstring : ["https://kewbi.sh/blog/index.xml"]);
 
 document.getElementById("er").style.display = "none";
 document.getElementById("sources").value = RSSES;
