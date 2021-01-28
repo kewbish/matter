@@ -3,17 +3,17 @@
     "short_name": "Matter",
     "icons": [
         {
-            "src": "assets/matter192.png",
+            "src": "matter192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "assets/matter512.png",
+            "src": "matter512.png",
             "sizes": "512x512",
             "type": "image/png"
         },
         {
-            "src": "assets/matter512.png",
+            "src": "matter512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
