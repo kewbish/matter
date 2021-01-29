@@ -128,7 +128,9 @@ function delItem(id) {
 function addItem(ln, title, desc, id) {
     var clone = article.content.cloneNode(true);
     clone.querySelector("a").href = ln;
+    title = title ? title.replace( /(<([^>]+)>)/ig, '') : title;
     clone.querySelector("h2").innerText =  title ? (title.length > 50 ? `${title.slice(0, 50)}...` : title) : "";
+    desc = desc ? desc.replace( /(<([^>]+)>)/ig, '') : desc;
     var descTrun = desc ? (desc.length > 50 ? `${desc.slice(0, 50)}...` : desc) : "";
     const linkId = " <a onclick='delItem(" + id + ")'>[delete]</a>";
     clone.querySelector("p").innerHTML = desc != undefined ? (id != undefined ? (descTrun + linkId) : descTrun) : (id != undefined ? linkId : "");
@@ -145,8 +147,7 @@ function rerender() {
 }
 
 function parseFeed(feed) {
-    // switch back when done
-    fetch(`https://cors-anywhere.herokuapp.com/${feed}`, { method: "GET", headers: { "Origin": "https://kewbi.sh/" } })
+    fetch(`https://matter-cors.herokuapp.com/${feed}`, { method: "GET", headers: { "Origin": "https://kewbi.sh/" } })
     .then(text => text.text())
     .then(texml => {
         const xml = new DOMParser().parseFromString(texml, 'text/xml');
