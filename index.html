@@ -42,15 +42,15 @@
                     <summary>GitHub Settings</summary>
                     <hr>
                     <label for="pat">GitHub PAT:</label>
-                    <input type="password" id="pat" onchange="setLoc(this.value, 'pat')">
+                    <input type="password" id="pat" onchange="setLoc('pat', this.value)">
                     <label for="repo">Repo (format: user/reponame):</label>
                     <div class="m-select">
-                        <select id="repo" onchange="setLoc(this.value, 'repo');drop(`https://api.github.com/repos/${localStorage.getItem('repo')}/issues`, 'isnum', 'number');"></select>
+                        <select id="repo" onchange="setLoc('repo', this.value);drop(`https://api.github.com/repos/${localStorage.getItem('repo')}/issues`, 'isnum', 'number');"></select>
                         <div class="m-sel"></div>
                     </div>
                     <label for="isnum">Issue #:</label>
                     <div class="m-select">
-                        <select id="isnum" onchange="setLoc(this.value, 'isnum');delComments();getBm();"></select>
+                        <select id="isnum" onchange="setLoc('isnum', this.value);delBms();getBm();"></select>
                         <div class="m-sel"></div>
                     </div>
                     <a href="https://github.com/apps/matter-a-minimal-rss-reader/installations/new" target="_blank" rel="noreferrer"><button>Log in w/ GitHub</button></a>

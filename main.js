@@ -1,6 +1,7 @@
 const urlstring = atob(window.location.hash.substring(1)).split(",");
 const urlloc = JSON.parse(localStorage.getItem("sources"));
-var RSSES = (urlloc && urlloc.indexOf("") == -1) ? urlloc :(urlstring.indexOf("") == -1 ? urlstring : ["https://kewbi.sh/blog/index.xml"]);
+// looks at the current url, if it doesn't exist, then fall back to localStorage. If not, then default RSS.
+var RSSES = (urlstring && urlstring.indexOf("") == -1) ? urlstring : (urlloc.indexOf("") == -1 ? urlloc : ["https://kewbi.sh/blog/index.xml"]);
 
 document.getElementById("er").style.display = "none";
 document.getElementById("sources").value = RSSES;
@@ -11,6 +12,7 @@ toURL(RSSES);
 const main = document.querySelector(".grid");
 const article = document.querySelector("#m-item");
 
+// get past feeds while reloading
 var feeds = JSON.parse(localStorage.getItem("feeds")) || [];
 var pat = "";
 var repo = "";
@@ -32,7 +34,7 @@ function toURL(val) {
         window.location.hash = btoa(val);
         window.location.reload();
     }
-    setLoc(JSON.stringify(RSSES), 'sources');
+    setLoc('sources', JSON.stringify(RSSES));
 }
 
 function upLoc() {
@@ -41,7 +43,7 @@ function upLoc() {
     isnum = localStorage.getItem("isnum");
 }
 
-function setLoc(val, name) {
+function setLoc(name, val) {
     if (document.getElementById(name)) {
         localStorage.setItem(name, val);
     }
@@ -107,13 +109,12 @@ function getBm() {
     });
 }
 
-function delComments() {
-    upLoc();
+function delBms() {
     feeds = feeds.filter(f => f.id == null);
     rerender();
 };
 
-function delItem(id) {
+function delBm(id) {
     upLoc();
     fetch(`https://api.github.com/repos/${repo}/issues/comments/${id}`, { method: "DELETE", headers: {"Authorization": `Bearer ${pat}`}})
     .then(() => {
@@ -132,7 +133,7 @@ function addItem(ln, title, desc, id) {
     clone.querySelector("h2").innerText =  title ? (title.length > 50 ? `${title.slice(0, 50)}...` : title) : "";
     desc = desc ? desc.replace( /(<([^>]+)>)/ig, '') : desc;
     var descTrun = desc ? (desc.length > 50 ? `${desc.slice(0, 50)}...` : desc) : "";
-    const linkId = " <a onclick='delItem(" + id + ")'>[delete]</a>";
+    const linkId = " <a onclick='delBm(" + id + ")'>[delete]</a>";
     clone.querySelector("p").innerHTML = desc != undefined ? (id != undefined ? (descTrun + linkId) : descTrun) : (id != undefined ? linkId : "");
     main.appendChild(clone);
 }
@@ -147,11 +148,12 @@ function rerender() {
 }
 
 function parseFeed(feed) {
+    // change this line when rehosting ⇓
     fetch(`https://matter-cors.herokuapp.com/${feed}`, { method: "GET", headers: { "Origin": "https://kewbi.sh/" } })
     .then(text => text.text())
     .then(texml => {
         const xml = new DOMParser().parseFromString(texml, 'text/xml');
-        const map = (c, f) => Array.prototype.slice.call(c, 0, 10).map(f);
+        const map = (c, f) => Array.prototype.slice.call(c, 0, 10).map(f); // max value to get from list
         const tag = (item, name) =>
           (item.getElementsByTagName(name)[0] || {}).textContent;
         switch (xml.documentElement.nodeName) {

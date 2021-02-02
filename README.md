@@ -18,14 +18,14 @@ Expand the `Advanced > GitHub Settings`, and click the 'Login with GitHub' butto
 After a PAT has been added, either through logging in or manually, fill in the name of your private repo, as well as the issue number Matter should read and write to.
 
 Under `Advanced`, a textbox to bookmark new links can be found. A comment can be added after the link (keep the https[s]:// bit) by separating the two with a comma. (something like: `https://kewbi.sh,This is a comment`)  
-New links will appear as a separate comment in the thread.
+New links will appear as a separate comment in the issue thread.
 
 You can delete bookmarks from the Matter side by clicking the delete button - this will remove the comment from the GitHub issue thread.
 
 ## Self-Hosting
 Everything is done entirely client-side, so checkout this repo and host the files on any server. (GitHub Pages will do very nicely if you fork the repo.)
 
-If you'll be heavily using this or expect many users, kindly host your own instance of [cors-anywhere](https://github.com/Rob--W/cors-anywhere) and replace the `matter-cors.herokuapp.com` [here](https://github.com/kewbish/matter/blob/master/main.js#L147).
+If you'll be heavily using this or expect many users, kindly host your own instance of [cors-anywhere](https://github.com/Rob--W/cors-anywhere) and replace the `matter-cors.herokuapp.com` [here](https://github.com/kewbish/matter/blob/master/main.js#L152).
 
 I've added a custom auth handler. The modifications I've made are below. You'll have to replace the client_id and client_secret with values of your own [GitHub App](https://github.com/settings/apps/new).
 ```js
