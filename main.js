@@ -14,9 +14,7 @@ const article = document.querySelector("#m-item");
 
 // get past feeds while reloading
 var feeds = JSON.parse(localStorage.getItem("feeds")) || [];
-var pat = "";
-var repo = "";
-var isnum = 1;
+var pat, repo, isnum = null;
 
 rerender();
 
@@ -30,11 +28,11 @@ document.getElementById("repo").value = localStorage.getItem("repo");
 document.getElementById("isnum").value = localStorage.getItem("isnum");
 
 function toURL(val) {
-    if (document.getElementById("sources").value != RSSES.join(",")) {
+    if (document.getElementById("sources").value != val.join(",")) {
         window.location.hash = btoa(val);
         window.location.reload();
     }
-    setLoc('sources', JSON.stringify(RSSES));
+    setLoc('sources', JSON.stringify(val));
 }
 
 function upLoc() {
