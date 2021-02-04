@@ -146,6 +146,8 @@ function rerender() {
 }
 
 function parseFeed(feed) {
+    var fhost = new URL(feed).host;
+    feeds = feeds.filter(f => new URL(f.link).host == fhost);
     // change this line when rehosting ⇓
     fetch(`https://matter-cors.herokuapp.com/${feed}`, { method: "GET", headers: { "Origin": "https://kewbi.sh/" } })
     .then(text => text.text())
@@ -183,7 +185,6 @@ function parseFeed(feed) {
     });
 }
 
-feeds = [];
 if (pat && repo && isnum) {
     getBm();
 }
