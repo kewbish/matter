@@ -28,11 +28,11 @@ document.getElementById("repo").value = localStorage.getItem("repo");
 document.getElementById("isnum").value = localStorage.getItem("isnum");
 
 function toURL(val) {
-    if (document.getElementById("sources").value != val.join(",")) {
+    setLoc('sources', JSON.stringify(val));
+    if (document.getElementById("sources").value != RSSES.join(",")) {
         window.location.hash = btoa(val);
         window.location.reload();
     }
-    setLoc('sources', JSON.stringify(val));
 }
 
 function upLoc() {
@@ -167,6 +167,7 @@ function parseFeed(feed) {
             rerender();
             return;
           case 'feed':
+            const regex = /(?<=&quot;)https:\/\/essays.findka.com.+?(?=&quot;)/g;
             feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('entry'), item => ({
               link: map(item.getElementsByTagName('link'), link => {
                   const rel = link.getAttribute('rel');
@@ -174,7 +175,10 @@ function parseFeed(feed) {
                     return link.getAttribute('href');
               }})[0],
               title: tag(item, 'title'),
-              desc: tag(item, 'summary'),
+              desc: new URL(feed).host == "essays.findka.com" ?
+                // tag(item, 'content').match(regex).join(" - ") :
+                tag(item, 'content') :
+                tag(item, 'summary'),
               date: new Date(tag(item, 'updated')),
             })));
             rerender();
