@@ -129,10 +129,15 @@ function addItem(ln, title, desc, id) {
     clone.querySelector("a").href = ln;
     title = title ? title.replace( /(<([^>]+)>)/ig, '') : title;
     clone.querySelector("h2").innerText =  title ? (title.length > 50 ? `${title.slice(0, 50)}...` : title) : "";
-    desc = desc ? desc.replace( /(<([^>]+)>)/ig, '') : desc;
-    var descTrun = desc ? (desc.length > 50 ? `${desc.slice(0, 50)}...` : desc) : "";
-    const linkId = " <a onclick='delBm(" + id + ")'>[delete]</a>";
-    clone.querySelector("p").innerHTML = desc != undefined ? (id != undefined ? (descTrun + linkId) : descTrun) : (id != undefined ? linkId : "");
+    if (desc && desc.startsWith("$FINDKA$")) {
+        desc = desc.replace("$FINDKA$", "").split(" - ");
+        clone.querySelector("p").innerHTML = `<a href="${desc[0]}" target="_blank">not interested</a> | <a href="${desc[1]}" target="_blank">like</a> | <a href="${desc[2]}" target="_blank">favourite</a>`;
+    } else {
+        desc = desc ? desc.replace( /(<([^>]+)>)/ig, '') : desc;
+        var descTrun = desc ? (desc.length > 50 ? `${desc.slice(0, 50)}...` : desc) : "";
+        const linkId = " <a onclick='delBm(" + id + ")'>[delete]</a>";
+        clone.querySelector("p").innerHTML = desc != undefined ? (id != undefined ? (descTrun + linkId) : descTrun) : (id != undefined ? linkId : "");
+    }
     main.appendChild(clone);
 }
 
@@ -167,7 +172,7 @@ function parseFeed(feed) {
             rerender();
             return;
           case 'feed':
-            const regex = /(?<=&quot;)https:\/\/essays.findka.com.+?(?=&quot;)/g;
+            const regex = /(?<=")https:\/\/essays.findka.com.+?(?=")/g;
             feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('entry'), item => ({
               link: map(item.getElementsByTagName('link'), link => {
                   const rel = link.getAttribute('rel');
@@ -176,8 +181,7 @@ function parseFeed(feed) {
               }})[0],
               title: tag(item, 'title'),
               desc: new URL(feed).host == "essays.findka.com" ?
-                // tag(item, 'content').match(regex).join(" - ") :
-                tag(item, 'content') :
+                "$FINDKA$" + tag(item, 'content').match(regex).join(" - ") :
                 tag(item, 'summary'),
               date: new Date(tag(item, 'updated')),
             })));
