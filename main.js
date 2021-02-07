@@ -129,8 +129,7 @@ function addItem(ln, title, desc, id) {
     clone.querySelector("a").href = ln;
     title = title ? title.replace( /(<([^>]+)>)/ig, '') : title;
     clone.querySelector("h2").innerText =  title ? (title.length > 50 ? `${title.slice(0, 50)}...` : title) : "";
-    if (desc && desc.startsWith("$FINDKA$")) {
-        desc = desc.replace("$FINDKA$", "").split(" - ");
+    if (desc && id == "FINDKA") {
         clone.querySelector("p").innerHTML = `<a href="${desc[0]}" target="_blank">not interested</a> | <a href="${desc[1]}" target="_blank">like</a> | <a href="${desc[2]}" target="_blank">favourite</a>`;
     } else {
         desc = desc ? desc.replace( /(<([^>]+)>)/ig, '') : desc;
@@ -172,7 +171,6 @@ function parseFeed(feed) {
             rerender();
             return;
           case 'feed':
-            const regex = /(?<=")https:\/\/essays.findka.com.+?(?=")/g;
             feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('entry'), item => ({
               link: map(item.getElementsByTagName('link'), link => {
                   const rel = link.getAttribute('rel');
@@ -181,8 +179,9 @@ function parseFeed(feed) {
               }})[0],
               title: tag(item, 'title'),
               desc: new URL(feed).host == "essays.findka.com" ?
-                "$FINDKA$" + tag(item, 'content').match(regex).join(" - ") :
+                [tag(item, 'findka:dislike'), tag(item, 'findka:like'), tag(item, 'findka:favorite')] :
                 tag(item, 'summary'),
+              id: new URL(feed).host == "essays.findka.com" ? "FINDKA" : null,
               date: new Date(tag(item, 'updated')),
             })));
             rerender();
