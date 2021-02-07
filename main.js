@@ -1,3 +1,5 @@
+// change this line when rehosting ⇓
+const CORSURL = 'https://matter-cors.herokuapp.com';
 const urlstring = atob(window.location.hash.substring(1)).split(",");
 const urlloc = JSON.parse(localStorage.getItem("sources"));
 // looks at the current url, if it doesn't exist, then fall back to localStorage. If not, then default RSS.
@@ -124,13 +126,20 @@ function delBm(id) {
     });
 }
 
+function rateFindka(ln) {
+    fetch(`${CORSURL}/${ln}`)
+    .catch(err => {
+        showEr(err);
+    });
+}
+
 function addItem(ln, title, desc, id) {
     var clone = article.content.cloneNode(true);
     clone.querySelector("a").href = ln;
     title = title ? title.replace( /(<([^>]+)>)/ig, '') : title;
     clone.querySelector("h2").innerText =  title ? (title.length > 50 ? `${title.slice(0, 50)}...` : title) : "";
     if (desc && id == "FINDKA") {
-        clone.querySelector("p").innerHTML = `<a href="${desc[0]}" target="_blank">not interested</a> | <a href="${desc[1]}" target="_blank">like</a> | <a href="${desc[2]}" target="_blank">favourite</a>`;
+        clone.querySelector("p").innerHTML = `<a onclick="rateFindka('${desc[0]}')">not interested</a> | <a onclick="rateFindka('${desc[1]}')">like</a> | <a onclick="rateFindka('${desc[2]}')">favourite</a>`;
     } else {
         desc = desc ? desc.replace( /(<([^>]+)>)/ig, '') : desc;
         var descTrun = desc ? (desc.length > 50 ? `${desc.slice(0, 50)}...` : desc) : "";
@@ -152,8 +161,7 @@ function rerender() {
 function parseFeed(feed) {
     var fhost = new URL(feed).host;
     feeds = feeds.filter(f => new URL(f.link).host == fhost);
-    // change this line when rehosting ⇓
-    fetch(`https://matter-cors.herokuapp.com/${feed}`, { method: "GET", headers: { "Origin": "https://kewbi.sh/" } })
+    fetch(`${CORSURL}/${feed}`, { method: "GET", headers: { "Origin": "https://kewbi.sh/" } })
     .then(text => text.text())
     .then(texml => {
         const xml = new DOMParser().parseFromString(texml, 'text/xml');
