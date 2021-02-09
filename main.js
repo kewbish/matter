@@ -140,8 +140,9 @@ function addItem(ln, title, desc, id) {
     title = title ? title.replace( /(<([^>]+)>)/g, '') : title;
     clone.querySelector("h2").innerText =  title ? (title.length > 50 ? `${title.slice(0, 50)}...` : title) : "";
     if (desc && id == "FINDKA") {
-        // these won't have a proper description, so don't need to truncate and add.
-        clone.querySelector("p").innerHTML = `<a onclick="rateFindka('${desc[0]}')">[not interested]</a> <a onclick="rateFindka('${desc[1]}')">[like]</a> <a onclick="rateFindka('${desc[2]}')">[favourite]</a>`;
+        desc[3] = desc[3] ? desc[3].replace( /(<([^>]+)>)/g, '') : desc[3];
+        var descTrun = desc[3] ? (desc[3].length > 50 ? `${desc[3].slice(0, 50)}...<br>` : desc[3] + "<br>") : "";
+        clone.querySelector("p").innerHTML = `${descTrun}<a onclick="rateFindka('${desc[0]}')">[not interested]</a> <a onclick="rateFindka('${desc[1]}')">[like]</a> <a onclick="rateFindka('${desc[2]}')">[favourite]</a>`;
     } else {
         desc = desc ? desc.replace( /(<([^>]+)>)/g, '') : desc;
         var descTrun = desc ? (desc.length > 50 ? `${desc.slice(0, 50)}...` : desc) : "";
@@ -192,7 +193,7 @@ function parseFeed(feed) {
               }})[0],
               title: tag(item, 'title'),
               desc: new URL(feed).host == "essays.findka.com" ?
-                [tag(item, 'findka:dislike'), tag(item, 'findka:like'), tag(item, 'findka:favorite')] :
+                [tag(item, 'findka:dislike'), tag(item, 'findka:like'), tag(item, 'findka:favorite'), tag(item, 'summary')] :
                 tag(item, 'summary'),
               id: new URL(feed).host == "essays.findka.com" ? "FINDKA" : null,
               date: new Date(tag(item, 'updated')),
