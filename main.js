@@ -1,8 +1,9 @@
 // change this line when rehosting ⇓
 const CORSURL = 'https://matter-cors.herokuapp.com';
+
 const urlstring = atob(window.location.hash.substring(1)).split(",");
 const urlloc = JSON.parse(localStorage.getItem("sources"));
-// looks at the current url, if it doesn't exist, then fall back to localStorage. If not, then default RSS.
+// looks at the current url, if it doesn't exist, then fall back to localStorage. If not, then set to default RSS.
 var RSSES = (urlstring && urlstring.indexOf("") == -1) ? urlstring : (urlloc.indexOf("") == -1 ? urlloc : ["https://kewbi.sh/blog/index.xml"]);
 
 document.getElementById("er").style.display = "none";
@@ -136,14 +137,17 @@ function rateFindka(ln) {
 function addItem(ln, title, desc, id) {
     var clone = article.content.cloneNode(true);
     clone.querySelector("a").href = ln;
-    title = title ? title.replace( /(<([^>]+)>)/ig, '') : title;
+    title = title ? title.replace( /(<([^>]+)>)/g, '') : title;
     clone.querySelector("h2").innerText =  title ? (title.length > 50 ? `${title.slice(0, 50)}...` : title) : "";
     if (desc && id == "FINDKA") {
-        clone.querySelector("p").innerHTML = `<a onclick="rateFindka('${desc[0]}')">not interested</a> | <a onclick="rateFindka('${desc[1]}')">like</a> | <a onclick="rateFindka('${desc[2]}')">favourite</a>`;
+        // these won't have a proper description, so don't need to truncate and add.
+        clone.querySelector("p").innerHTML = `<a onclick="rateFindka('${desc[0]}')">[not interested]</a> <a onclick="rateFindka('${desc[1]}')">[like]</a> <a onclick="rateFindka('${desc[2]}')">[favourite]</a>`;
     } else {
-        desc = desc ? desc.replace( /(<([^>]+)>)/ig, '') : desc;
+        desc = desc ? desc.replace( /(<([^>]+)>)/g, '') : desc;
         var descTrun = desc ? (desc.length > 50 ? `${desc.slice(0, 50)}...` : desc) : "";
         const linkId = " <a onclick='delBm(" + id + ")'>[delete]</a>";
+        // if description does exist => if id, then bookmark, add delete. If not, add the truncated description.
+        // if description does not exist => if id, then bookmark, add delete. Otherwise, set to empty.
         clone.querySelector("p").innerHTML = desc != undefined ? (id != undefined ? (descTrun + linkId) : descTrun) : (id != undefined ? linkId : "");
     }
     main.appendChild(clone);
@@ -169,6 +173,7 @@ function parseFeed(feed) {
         const tag = (item, name) =>
           (item.getElementsByTagName(name)[0] || {}).textContent;
         switch (xml.documentElement.nodeName) {
+          // two types of rss feeds - map correct output to each
           case 'rss':
             feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('item'), item => ({
               link: tag(item, 'link'),

@@ -1,6 +1,6 @@
 # Matter
 ![Matter logo - a mobius strip with a m.](assets/matter192.png)  
-An RSS links page + bookmarker. Heavily personalized.  
+An RSS links page + bookmarker.  
 Made in vanilla JS, December 2020 to present.  
 Created by [Kewbish](https://github.com/kewbish).  
 Released under the [GNU GPLv3 License](./LICENSE).
@@ -30,7 +30,7 @@ You can delete bookmarks from the Matter side by clicking the delete button - th
 ## Self-Hosting
 Everything is done entirely client-side, so checkout this repo and host the files on any server. (GitHub Pages will do very nicely if you fork the repo.)
 
-If you'll be heavily using this or expect many users, kindly host your own instance of [cors-anywhere](https://github.com/Rob--W/cors-anywhere) and replace the `matter-cors.herokuapp.com` [here](https://github.com/kewbish/matter/blob/master/main.js#L1) (make sure not to include an extra slash at the end of your URL).
+If you'll be heavily using this or expect many users, kindly host your own instance of [cors-anywhere](https://github.com/Rob--W/cors-anywhere) and replace the `matter-cors.herokuapp.com` [here](https://github.com/kewbish/matter/blob/master/main.js#L2) (make sure not to include an extra slash at the end of your URL).
 
 I've added a custom auth handler to Cors-Anywhere. The modifications I've made are below - copy paste this into the source of your hosted instance. You'll have to replace the client_id and client_secret with values of your own [GitHub App](https://github.com/settings/apps/new).
 ```js
