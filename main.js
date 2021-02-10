@@ -165,7 +165,11 @@ function rerender() {
 
 function parseFeed(feed) {
     var fhost = new URL(feed).host;
-    feeds = feeds.filter(f => new URL(f.link).host == fhost);
+    if (fhost != "essays.findka.com") {
+        feeds = feeds.filter(f => new URL(f.link).host == fhost);
+    } else {
+        feeds = feeds.filter(f => f.id != "FINDKA");
+    }
     fetch(`${CORSURL}/${feed}`, { method: "GET", headers: { "Origin": "https://kewbi.sh/" } })
     .then(text => text.text())
     .then(texml => {
