@@ -111,7 +111,7 @@ function getBm() {
 }
 
 function delBms() {
-    feeds = feeds.filter(f => f.id == null);
+    feeds = feeds.filter(f => f.id == null || f.id == "FINDKA");
     rerender();
 };
 
@@ -178,7 +178,7 @@ function parseFeed(feed) {
         const tag = (item, name) =>
           (item.getElementsByTagName(name)[0] || {}).textContent;
         switch (xml.documentElement.nodeName) {
-          // two types of rss feeds - map correct output to each
+          // two types of rss feeds - map each to correct output
           case 'rss':
             feeds = feeds.concat(map(xml.documentElement.getElementsByTagName('item'), item => ({
               link: tag(item, 'link'),
