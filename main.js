@@ -9,6 +9,7 @@ var RSSES = (urlstring && urlstring.indexOf("") == -1) ? urlstring : (urlloc.ind
 document.getElementById("er").style.display = "none";
 document.getElementById("sources").value = RSSES;
 document.getElementById("pat").value = localStorage.getItem("pat");
+document.getElementById("advanced").open = localStorage.getItem("advopen") || false;
 
 toURL(RSSES);
 
