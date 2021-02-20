@@ -164,7 +164,7 @@ function rerender() {
     localStorage.setItem('feeds', JSON.stringify(feeds));
 }
 
-async function parseFeed(feed) {
+function parseFeed(feed) {
     var fhost = new URL(feed).host;
     if (fhost != "essays.findka.com") {
         feeds = feeds.filter(f => new URL(f.link).host == fhost);
@@ -214,7 +214,7 @@ async function parseFeed(feed) {
 if (pat && repo && isnum) {
     getBm();
 }
-RSSES.forEach(async (rss) => {
-    await parseFeed(rss);
+RSSES.forEach(rss => {
+    parseFeed(rss);
 });
 
