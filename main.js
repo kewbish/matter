@@ -175,7 +175,7 @@ function parseFeed(feed) {
     .then(text => text.text())
     .then(texml => {
         const xml = new DOMParser().parseFromString(texml, 'text/xml');
-        const map = (c, f) => Array.prototype.slice.call(c, 0, 10).map(f); // max value to get from list
+        const map = (c, f) => Array.prototype.slice.call(c, 0, 10).map(f); // ⇐ max value to get from list, change this
         const tag = (item, name) =>
           (item.getElementsByTagName(name)[0] || {}).textContent;
         switch (xml.documentElement.nodeName) {
