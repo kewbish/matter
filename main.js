@@ -4,7 +4,7 @@ const CORSURL = 'https://matter-cors.herokuapp.com';
 const urlstring = atob(window.location.hash.substring(1)).split(",");
 const urlloc = JSON.parse(localStorage.getItem("sources"));
 // looks at the current url, if it doesn't exist, then fall back to localStorage. If not, then set to default RSS.
-var RSSES = (urlstring && urlstring.indexOf("") == -1) ? urlstring : (urlloc.indexOf("") == -1 ? urlloc : ["https://kewbi.sh/blog/index.xml"]);
+var RSSES = (urlstring && urlstring.indexOf("") == -1) ? urlstring : (urlloc && urlloc.indexOf("") == -1 ? urlloc : ["https://kewbi.sh/blog/index.xml"]);
 
 document.getElementById("er").style.display = "none";
 document.getElementById("sources").value = RSSES;
