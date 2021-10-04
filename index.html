@@ -45,7 +45,7 @@
                     <input type="password" id="pat" onchange="setLoc('pat', this.value)">
                     <label for="repo">Repo (format: user/reponame):</label>
                     <div class="m-select">
-                        <select id="repo" onchange="setLoc('repo', this.value);drop(`https://api.github.com/repos/${localStorage.getItem('repo')}/issues`, 'isnum', 'number');"></select>
+                        <select id="repo" onchange="setLoc('repo', this.value);"></select>
                         <div class="m-sel"></div>
                     </div>
                     <label for="isnum">Issue #:</label>
