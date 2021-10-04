@@ -22,12 +22,7 @@ var pat, repo, isnum = null;
 
 rerender();
 
-if (localStorage.getItem("pat") != null) {
-    drop("https://api.github.com/user/repos", "repo", "full_name");
-    if (localStorage.getItem("repo") != null) {
-        drop(`https://api.github.com/repos/${localStorage.getItem('repo')}/issues`, 'isnum', 'number');
-    }
-}
+drops();
 document.getElementById("repo").value = localStorage.getItem("repo");
 document.getElementById("isnum").value = localStorage.getItem("isnum");
 
@@ -36,6 +31,15 @@ function toURL(val) {
     if (document.getElementById("sources").value != RSSES.join(",")) {
         window.location.hash = btoa(val);
         window.location.reload();
+    }
+}
+
+function drops() {
+    if (localStorage.getItem("pat") != null) {
+        drop("https://api.github.com/user/repos", "repo", "full_name");
+        if (localStorage.getItem("repo") != null) {
+            drop(`https://api.github.com/repos/${localStorage.getItem('repo')}/issues`, 'isnum', 'number');
+        }
     }
 }
 
@@ -49,6 +53,7 @@ function setLoc(name, val) {
     if (document.getElementById(name)) {
         localStorage.setItem(name, val);
     }
+    drops();
 }
 
 function showEr(er) {
