@@ -22,7 +22,6 @@ var pat, repo, isnum = null;
 
 rerender();
 
-drops();
 document.getElementById("repo").value = localStorage.getItem("repo");
 document.getElementById("isnum").value = localStorage.getItem("isnum");
 
@@ -161,6 +160,7 @@ function addItem(ln, title, desc, id) {
 
 function rerender() {
     main.innerHTML = "";
+    feeds = [... new Set(feeds.map(JSON.stringify))].map(JSON.parse);
     feeds = feeds.slice().sort((a, b) => b.date - a.date);
     feeds.forEach(item => {
         addItem(item.link, item.title, item.desc, item.id);
