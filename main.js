@@ -68,6 +68,7 @@ function drop(url, id, prop) {
     .then(res => res.json())
     .then(jsn => {
         if (jsn) {
+            dropObj.textContent = "";
             jsn.forEach(j => {
                 option = document.createElement('option');
                 option.text = j[prop];
@@ -152,6 +153,7 @@ function addItem(ln, title, desc, id) {
         desc = desc ? desc.replace( /(<([^>]+)>)/g, '') : desc;
         var descTrun = desc ? (desc.length > 50 ? `${desc.slice(0, 50)}...` : desc) : "";
         const linkId = " <a onclick='delBm(" + id + ")'>[delete]</a>";
+        clone.querySelector("p").innerHTML = desc != undefined ? (id != undefined ? (descTrun + linkId) : descTrun) : (id != undefined ? linkId : "");
         // if description does exist => if id, then bookmark, add delete. If not, add the truncated description.
         // if description does not exist => if id, then bookmark, add delete. Otherwise, set to empty.  clone.querySelector("p").innerHTML = desc != undefined ? (id != undefined ? (descTrun + linkId) : descTrun) : (id != undefined ? linkId : "");
     }
