@@ -32,18 +32,16 @@
             <details id="advanced">
                 <summary onclick="localStorage.setItem('advopen', !document.getElementById('advanced').open);">Advanced</summary>
                 <details>
-                    <hr>
-                    <summary>Edit sources</summary>
-                    <label for="sources">Type comma separated list of sources below.</label>
+                    <summary>Edit Sources</summary>
+                    <label for="sources">Comma separated list of RSS feed URLS:</label>
                     <input type="text" id="sources" onchange="toURL(this.value);">
                     <hr>
                 </details>
                 <details>
                     <summary>GitHub Settings</summary>
-                    <hr>
                     <label for="pat">GitHub PAT:</label>
                     <input type="password" id="pat" onchange="setLoc('pat', this.value)">
-                    <label for="repo">Repo (format: user/reponame):</label>
+                    <label for="repo">Repo (to read bookmarks from):</label>
                     <div class="m-select">
                         <select id="repo" onchange="setLoc('repo', this.value);"></select>
                         <div class="m-sel"></div>
