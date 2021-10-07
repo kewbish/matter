@@ -167,7 +167,7 @@ function rerender() {
     feeds.forEach(item => {
         addItem(item.link, item.title, item.desc, item.id);
     });
-    localStorage.setItem('feeds', JSON.stringify(feeds));
+    localStorage.setItem('feeds', JSON.stringify(feeds.slice(0,100)));
 }
 
 function parseFeed(feed) {
