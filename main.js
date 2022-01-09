@@ -151,7 +151,7 @@ function getBm() {
 }
 
 function delBms() {
-    feeds = feeds.filter((f) => f.id == null || f.id == "FINDKA");
+    feeds = feeds.filter((f) => f.id == null);
     rerender();
 }
 
@@ -170,12 +170,6 @@ function delBm(id) {
         });
 }
 
-function rateFindka(ln) {
-    fetch(`${CORSURL}/${ln}`).catch((err) => {
-        showEr(err);
-    });
-}
-
 function addItem(ln, title, desc, id) {
     var clone = article.content.cloneNode(true);
     clone.querySelector("a").href = ln;
@@ -185,35 +179,23 @@ function addItem(ln, title, desc, id) {
             ? `${title.slice(0, 50)}...`
             : title
         : "";
-    if (desc && id == "FINDKA") {
-        desc[3] = desc[3] ? desc[3].replace(/(<([^>]+)>)/g, "") : desc[3];
-        var descTrun = desc[3]
-            ? desc[3].length > 50
-                ? `${desc[3].slice(0, 50)}...<br>`
-                : desc[3] + "<br>"
+    desc = desc ? desc.replace(/(<([^>]+)>)/g, "") : desc;
+    var descTrun = desc
+        ? desc.length > 50
+            ? `${desc.slice(0, 50)}...`
+            : desc
+        : "";
+    const linkId = " <a onclick='delBm(" + id + ")'>[delete]</a>";
+    clone.querySelector("p").innerHTML =
+        desc != undefined
+            ? id != undefined
+                ? descTrun + linkId
+                : descTrun
+            : id != undefined
+            ? linkId
             : "";
-        clone.querySelector(
-            "p"
-        ).innerHTML = `${descTrun}<a onclick="rateFindka('${desc[0]}')">[not interested]</a> <a onclick="rateFindka('${desc[1]}')">[like]</a> <a onclick="rateFindka('${desc[2]}')">[favourite]</a>`;
-    } else {
-        desc = desc ? desc.replace(/(<([^>]+)>)/g, "") : desc;
-        var descTrun = desc
-            ? desc.length > 50
-                ? `${desc.slice(0, 50)}...`
-                : desc
-            : "";
-        const linkId = " <a onclick='delBm(" + id + ")'>[delete]</a>";
-        clone.querySelector("p").innerHTML =
-            desc != undefined
-                ? id != undefined
-                    ? descTrun + linkId
-                    : descTrun
-                : id != undefined
-                ? linkId
-                : "";
-        // if description does exist => if id, then bookmark, add delete. If not, add the truncated description.
-        // if description does not exist => if id, then bookmark, add delete. Otherwise, set to empty.
-    }
+    // if description does exist => if id, then bookmark, add delete. If not, add the truncated description.
+    // if description does not exist => if id, then bookmark, add delete. Otherwise, set to empty.
     main.appendChild(clone);
 }
 
@@ -231,11 +213,7 @@ function rerender() {
 
 function parseFeed(feed) {
     var fhost = new URL(feed).host;
-    if (fhost != "essays.findka.com") {
-        feeds = feeds.filter((f) => new URL(f.link).host == fhost);
-    } else {
-        feeds = feeds.filter((f) => f.id != "FINDKA");
-    }
+    feeds = feeds.filter((f) => new URL(f.link).host == fhost);
     fetch(`${CORSURL}/${feed}`, {
         method: "GET",
         headers: { Origin: "https://kewbi.sh/" },
@@ -277,19 +255,7 @@ function parseFeed(feed) {
                                     }
                                 )[0],
                                 title: tag(item, "title"),
-                                desc:
-                                    new URL(feed).host == "essays.findka.com"
-                                        ? [
-                                              tag(item, "findka:dislike"),
-                                              tag(item, "findka:like"),
-                                              tag(item, "findka:favorite"),
-                                              tag(item, "summary"),
-                                          ]
-                                        : tag(item, "summary"),
-                                id:
-                                    new URL(feed).host == "essays.findka.com"
-                                        ? "FINDKA"
-                                        : null,
+                                desc: tag(item, "summary"),
                                 date: new Date(tag(item, "updated")),
                             })
                         )
