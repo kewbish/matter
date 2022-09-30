@@ -23,7 +23,12 @@ const main = document.querySelector(".grid");
 const article = document.querySelector("#m-item");
 
 // get past feeds while reloading
-var feeds = JSON.parse(localStorage.getItem("feeds")) || [];
+let feeds = [];
+try {
+  feeds = JSON.parse(localStorage.getItem("feeds")) || [];
+} catch {
+  feeds = [];
+}
 var pat,
   repo,
   isnum = null;
@@ -96,6 +101,16 @@ function saveNew(val) {
   upLoc();
   if (pat == null || repo == null || isnum == null) {
     showEr("Fill out all of [pat, repo, issue number].");
+    return;
+  }
+  if (!val) {
+    showEr("Please enter a valid URL.");
+    return;
+  }
+  try {
+    const _ = new URL(val);
+  } catch {
+    showEr("Please enter a valid URL.");
     return;
   }
   fetch(`https://api.github.com/repos/${repo}/issues/${isnum}/comments`, {
