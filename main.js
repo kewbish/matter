@@ -215,11 +215,14 @@ function addItem(ln, title, desc, id) {
 function rerender() {
   main.innerHTML = "";
   feeds = [...new Set(feeds.map(JSON.stringify))].map(JSON.parse);
-  feeds = feeds.slice().sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+  feeds = feeds
+    .slice()
+    .sort((a, b) => Date.parse(b.date) - Date.parse(a.date))
+    .slice(0, 50);
   feeds.forEach((item) => {
     addItem(item.link, item.title, item.desc, item.id);
   });
-  localStorage.setItem("feeds", JSON.stringify(feeds.slice(0, 100)));
+  localStorage.setItem("feeds", JSON.stringify(feeds));
 }
 
 function parseFeed(feed) {
