@@ -7,15 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="https://kewbi.sh/css/main.css" />
     <link rel="stylesheet" href="main.css" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap&text=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-      rel="stylesheet"
-    />
     <title>Matter</title>
     <meta
       name="description"
@@ -45,77 +36,75 @@
     <link rel="apple-touch-icon" href="assets/matter192.png" />
     <meta name="theme-color" content="#1E1E1E" />
   </head>
-  <body>
-    <div class="cont page">
-      <div class="m-matter">
-        <h1 class="subtitle">Matter</h1>
-        <hr />
-        <details id="advanced">
-          <summary
-            onclick="localStorage.setItem('advopen', !document.getElementById('advanced').open);"
-          >
-            Advanced
-          </summary>
-          <details>
-            <summary>Edit Sources</summary>
-            <label for="sources">Comma separated list of RSS feed URLS:</label>
-            <input type="text" id="sources" onchange="toURL(this.value);" />
-            <hr />
-          </details>
-          <details>
-            <summary>GitHub Settings</summary>
-            <label for="pat">GitHub PAT:</label>
-            <input
-              type="password"
-              id="pat"
-              onchange="setLoc('pat', this.value)"
-            />
-            <label for="repo">Repo (to read bookmarks from):</label>
-            <div class="m-select">
-              <select id="repo" onchange="setLoc('repo', this.value);"></select>
-              <div class="m-sel"></div>
-            </div>
-            <label for="isnum">Issue #:</label>
-            <div class="m-select">
-              <select
-                id="isnum"
-                onchange="setLoc('isnum', this.value);delBms();getBm();"
-              ></select>
-              <div class="m-sel"></div>
-            </div>
-            <a
-              href="https://github.com/login/oauth/authorize?client_id=Iv1.3f4fb1ba73a1a737"
-              target="_blank"
-              rel="noreferrer"
-              id="login-btn"
-              ><button>Log in w/ GitHub</button></a
-            >
-            <hr />
-          </details>
-          <label for="newurl">New URL to bookmark:</label>
-          <input type="text" id="newurl" onchange="saveNew(this.value)" />
-        </details>
-        <hr />
-        <div
-          class="grid-element m-grid-el"
-          id="er"
-          style="background-color: #525252"
+  <body class="page page-padding">
+    <div class="m-matter">
+      <h1 class="display-title">Matter.</h1>
+      <hr />
+      <details id="advanced">
+        <summary
+          onclick="localStorage.setItem('advopen', !document.getElementById('advanced').open);"
         >
+          Advanced
+        </summary>
+        <details>
+          <summary>Edit Sources</summary>
+          <label for="sources">Comma separated list of RSS feed URLS:</label>
+          <input type="text" id="sources" onchange="toURL(this.value);" />
+          <hr />
+        </details>
+        <details>
+          <summary>GitHub Settings</summary>
+          <label for="pat">GitHub PAT:</label>
+          <input
+            type="password"
+            id="pat"
+            onchange="setLoc('pat', this.value)"
+          />
+          <label for="repo">Repo (to read bookmarks from):</label>
+          <div class="m-select">
+            <select id="repo" onchange="setLoc('repo', this.value);"></select>
+            <div class="m-sel"></div>
+          </div>
+          <label for="isnum">Issue #:</label>
+          <div class="m-select">
+            <select
+              id="isnum"
+              onchange="setLoc('isnum', this.value);delBms();getBm();"
+            ></select>
+            <div class="m-sel"></div>
+          </div>
+          <a
+            href="https://github.com/login/oauth/authorize?client_id=Iv1.3f4fb1ba73a1a737"
+            target="_blank"
+            rel="noreferrer"
+            id="login-btn"
+            ><button>Log in w/ GitHub</button></a
+          >
+          <hr />
+        </details>
+        <label for="newurl">New URL to bookmark:</label>
+        <input type="text" id="newurl" onchange="saveNew(this.value)" />
+      </details>
+      <hr />
+      <div
+        class="grid-element m-grid-el"
+        id="er"
+        style="background-color: #525252"
+      >
+        <p></p>
+      </div>
+      <div class="grid"></div>
+      <template id="m-item">
+        <div class="grid-element m-grid-el">
+          <a><h2></h2></a>
           <p></p>
         </div>
-        <div class="grid"></div>
-        <template id="m-item">
-          <div class="grid-element m-grid-el">
-            <a><h2></h2></a>
-            <p></p>
-          </div>
-        </template>
-        <br />
-        <p>
-          Created by <a href="https://kewbi.sh">Kewbish</a>. Source available at
-          <a href="https://github.com/kewbish/matter">kewbish/matter</a>.
-        </p>
-      </div>
+      </template>
+      <br />
+      <p>
+        Created by <a href="https://kewbi.sh">Kewbish</a>. Source available at
+        <a href="https://github.com/kewbish/matter">kewbish/matter</a>.
+      </p>
     </div>
     <script src="./main.js"></script>
   </body>
