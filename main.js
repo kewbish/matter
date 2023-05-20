@@ -19,6 +19,8 @@ const setup = () => {
   document.getElementById("er").style.display = "none";
   document.getElementById("sources").value = RSSES;
   document.getElementById("pat").value = localStorage.getItem("pat");
+  document.getElementById("repo").value = localStorage.getItem("repo");
+  document.getElementById("isnum").value = localStorage.getItem("isnum");
   document.getElementById("advanced").open =
     JSON.parse(localStorage.getItem("advopen")) || false;
 
@@ -42,9 +44,6 @@ var pat,
   isnum = null;
 
 rerender();
-
-document.getElementById("repo").value = localStorage.getItem("repo");
-document.getElementById("isnum").value = localStorage.getItem("isnum");
 
 function toURL(val) {
   setLoc("sources", JSON.stringify(val));
@@ -292,7 +291,7 @@ const loadPortal = () => {
   const createPortal = async () => {
     const bigObject = {
       sources: localStorage.getItem("sources"),
-      isnum: localStorage.getItem("sources"),
+      isnum: localStorage.getItem("isnum"),
       pat: localStorage.getItem("pat"),
       repo: localStorage.getItem("repo"),
     };
@@ -335,13 +334,17 @@ const loadPortal = () => {
       if (jsn.error) {
         createPortal();
       } else {
-        const values = atob(jsn.data);
+        const values = JSON.parse(atob(jsn.data));
         setLoc("sources", values.sources);
         setLoc("isnum", values.isnum);
         setLoc("pat", values.pat);
         setLoc("repo", values.repo);
         upLoc();
         setup();
+        getBm();
+        RSSES.forEach((rss) => {
+          parseFeed(rss);
+        });
         rerender();
         document.getElementById("er").style.display = "none";
         document.getElementById("portal-user").value = "";

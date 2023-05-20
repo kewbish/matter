@@ -32,7 +32,7 @@ app.get("/portal", async (c: Context) => {
     // TODO: store based on hash of password instead and encrypt stored data with password
     const data = await c.env.PORTAL.get(`${userTry.user}:${userTry.password}`);
     if (data) {
-      return new Response(data, { headers: HEADERS });
+      return new Response(JSON.stringify({ data }), { headers: HEADERS });
     } else {
       return new Response(JSON.stringify({ error: "No portal found." }), {
         status: 404,
