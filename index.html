@@ -82,6 +82,34 @@
           >
           <hr />
         </details>
+        <details>
+          <summary>Matter Portal</summary>
+          <p>
+            <em
+              >This creates a portal with your data if one doesn't already
+              exist, and loads your data if one does. Careful: anyone with this
+              information will also have access to your GitHub PAT if you've set
+              it.</em
+            >
+          </p>
+          <label for="portal-user">Username (may not contain a colon):</label>
+          <input
+            type="text"
+            id="portal-user"
+            pattern="[^:]+"
+            oninput="validatePortal()"
+          />
+          <label for="portal-password">Password:</label>
+          <input
+            type="password"
+            id="portal-password"
+            oninput="validatePortal()"
+          />
+          <button onclick="loadPortal()" id="portal-btn" disabled>
+            Load Portal
+          </button>
+          <hr />
+        </details>
         <label for="newurl">New URL to bookmark:</label>
         <input type="text" id="newurl" onchange="saveNew(this.value)" />
       </details>

@@ -29,6 +29,7 @@ app.options("*", (c) => {
 app.get("/portal", async (c: Context) => {
   const userTry = await basicAuthentication(c.req);
   if (c.req.headers.has("Authorization") && userTry) {
+    // TODO: store based on hash of password instead and encrypt stored data with password
     const data = await c.env.PORTAL.get(`${userTry.user}:${userTry.password}`);
     if (data) {
       return new Response(data, { headers: HEADERS });

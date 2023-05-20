@@ -1,23 +1,31 @@
 // change this line when rehosting ⇓
 const CORSURL = "https://matter-cors.fly.dev";
 
-const urlstring = atob(window.location.hash.substring(1)).split(",");
-const urlloc = JSON.parse(localStorage.getItem("sources"));
-// looks at the current url, if it doesn't exist, then fall back to localStorage. If not, then set to default RSS.
-var RSSES =
-  urlstring && urlstring.indexOf("") == -1
-    ? urlstring
-    : urlloc && urlloc.indexOf("") == -1
-    ? urlloc
-    : ["https://kewbi.sh/blog/index.xml"];
+let urlstring = "";
+let urlloc = {};
+let RSSES = [];
 
-document.getElementById("er").style.display = "none";
-document.getElementById("sources").value = RSSES;
-document.getElementById("pat").value = localStorage.getItem("pat");
-document.getElementById("advanced").open =
-  JSON.parse(localStorage.getItem("advopen")) || false;
+const setup = () => {
+  urlstring = atob(window.location.hash.substring(1)).split(",");
+  urlloc = JSON.parse(localStorage.getItem("sources"));
+  // looks at the current url, if it doesn't exist, then fall back to localStorage. If not, then set to default RSS.
+  RSSES =
+    urlstring && urlstring.indexOf("") == -1
+      ? urlstring
+      : urlloc && urlloc.indexOf("") == -1
+      ? urlloc
+      : ["https://kewbi.sh/blog/index.xml"];
 
-toURL(RSSES);
+  document.getElementById("er").style.display = "none";
+  document.getElementById("sources").value = RSSES;
+  document.getElementById("pat").value = localStorage.getItem("pat");
+  document.getElementById("advanced").open =
+    JSON.parse(localStorage.getItem("advopen")) || false;
+
+  toURL(RSSES);
+};
+
+setup();
 
 const main = document.querySelector(".grid");
 const article = document.querySelector("#m-item");
@@ -273,6 +281,75 @@ function parseFeed(feed) {
       showEr(err);
     });
 }
+
+const validatePortal = () => {
+  const username = document.getElementById("portal-user").value;
+  const password = document.getElementById("portal-password").value;
+  document.getElementById("portal-btn").disabled = !username || !password;
+};
+
+const loadPortal = () => {
+  const createPortal = async () => {
+    const bigObject = {
+      sources: localStorage.getItem("sources"),
+      isnum: localStorage.getItem("sources"),
+      pat: localStorage.getItem("pat"),
+      repo: localStorage.getItem("repo"),
+    };
+    const b64JSON = btoa(JSON.stringify(bigObject));
+    const body = { user: username, password, contents: b64JSON };
+    fetch("https://matter-portal.kewbish.workers.dev/create", {
+      ...HEADERS,
+      method: "POST",
+      body: JSON.stringify(body),
+    })
+      .then((res) => res.json())
+      .then((jsn) => {
+        if (jsn.error) {
+          showEr(jsn.error);
+        } else {
+          document.getElementById("er").style.display = "none";
+          document.getElementById("portal-user").value = "";
+          document.getElementById("portal-password").value = "";
+        }
+      })
+      .catch((err) => showEr(err.toString()));
+  };
+
+  const username = document.getElementById("portal-user").value;
+  const password = document.getElementById("portal-password").value;
+  if (!username || !password) {
+    validatePortal();
+    return;
+  }
+  if (document.location.protocol === "http:") {
+    showEr("Please use HTTPS to ensure authentication is secure.");
+    return;
+  }
+  const HEADERS = {
+    headers: { Authorization: `Basic ${btoa(username + ":" + password)}` },
+  };
+  fetch("https://matter-portal.kewbish.workers.dev/portal", HEADERS)
+    .then((res) => res.json())
+    .then((jsn) => {
+      if (jsn.error) {
+        createPortal();
+      } else {
+        const values = atob(jsn.data);
+        setLoc("sources", values.sources);
+        setLoc("isnum", values.isnum);
+        setLoc("pat", values.pat);
+        setLoc("repo", values.repo);
+        upLoc();
+        setup();
+        rerender();
+        document.getElementById("er").style.display = "none";
+        document.getElementById("portal-user").value = "";
+        document.getElementById("portal-password").value = "";
+      }
+    })
+    .catch((err) => showEr(err.toString()));
+};
 
 upLoc();
 if (pat) {
