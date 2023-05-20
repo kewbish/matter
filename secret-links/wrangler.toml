@@ -1,6 +1,0 @@
-name = "secret-links"
-main = "src/index.ts"
-compatibility_date = "2023-01-07"
-kv_namespaces= [
-    { binding = "SECRET_LINKS", id = "6a4a900f46304e92a305b953396bdb89" }
-]

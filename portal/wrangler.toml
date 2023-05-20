@@ -1,0 +1,6 @@
+name = "matter-portal"
+main = "src/index.ts"
+compatibility_date = "2023-01-07"
+kv_namespaces= [
+    { binding = "PORTAL", id = "c542409476474284be9eff192bb38093" }
+]
