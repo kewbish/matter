@@ -1,5 +1,6 @@
 import { Context, Hono } from "hono";
 import { cors } from "hono/cors";
+import { Buffer } from "node:buffer";
 
 export interface Env {
   PORTAL: KVNamespace;
@@ -74,56 +75,62 @@ app.get("/portal", async (c: Context) => {
 });
 
 app.post("/create", async (c: Context) => {
-  let rawBody = (await c.req.json()) as any;
-  if (
-    !Object.keys(rawBody).length ||
-    !rawBody.user ||
-    !rawBody.password ||
-    !rawBody.contents
-  ) {
-    return new Response(
-      JSON.stringify({ error: "Include user, password, and contents." }),
-      { headers: HEADERS }
+  try {
+    let rawBody = (await c.req.json()) as any;
+    if (
+      !Object.keys(rawBody).length ||
+      !rawBody.user ||
+      !rawBody.password ||
+      !rawBody.contents
+    ) {
+      return new Response(
+        JSON.stringify({ error: "Include user, password, and contents." }),
+        { headers: HEADERS }
+      );
+    }
+
+    const salt = crypto.getRandomValues(new Uint8Array(8));
+    const saltedHash = await crypto.subtle.digest(
+      "SHA-256",
+      Buffer.concat([Buffer.from(rawBody.password), Buffer.from(salt)])
     );
+    const passwordHash = Buffer.concat([
+      Buffer.from(saltedHash),
+      Buffer.from(":"),
+      Buffer.from(salt),
+    ]);
+    await c.env.PASSWORDS.put(
+      rawBody.user,
+      Buffer.from(passwordHash).toString("hex")
+    );
+
+    const iv = crypto.getRandomValues(new Uint8Array(16));
+    const key = await crypto.subtle.importKey(
+      "raw",
+      Buffer.from(passwordHash),
+      "AES-CBC",
+      true,
+      ["encrypt", "decrypt"]
+    );
+    const encryptedData = await crypto.subtle.encrypt(
+      { name: "AES-CBC", iv },
+      key,
+      rawBody.contents
+    );
+
+    await c.env.PORTAL.put(
+      rawBody.user,
+      JSON.stringify({
+        iv: Buffer.from(iv).toString("hex"),
+        encryptedData: Buffer.from(encryptedData).toString("hex"),
+      })
+    );
+    return new Response(JSON.stringify({}), { headers: HEADERS });
+  } catch (e: any) {
+    return new Response(JSON.stringify({ e: e.toString() }), {
+      headers: HEADERS,
+    });
   }
-
-  const salt = crypto.getRandomValues(new Uint8Array(8));
-  const saltedHash = await crypto.subtle.digest(
-    "SHA-256",
-    Buffer.concat([Buffer.from(rawBody.password), Buffer.from(salt)])
-  );
-  const passwordHash = Buffer.concat([
-    Buffer.from(saltedHash),
-    Buffer.from(":"),
-    Buffer.from(salt),
-  ]);
-  await c.env.PASSWORDS.put(
-    rawBody.user,
-    Buffer.from(passwordHash).toString("hex")
-  );
-
-  const iv = crypto.getRandomValues(new Uint8Array(16));
-  const key = await crypto.subtle.importKey(
-    "raw",
-    Buffer.from(passwordHash),
-    "AES-CBC",
-    true,
-    ["encrypt", "decrypt"]
-  );
-  const encryptedData = await crypto.subtle.encrypt(
-    { name: "AES-CBC", iv },
-    key,
-    rawBody.contents
-  );
-
-  await c.env.PORTAL.put(
-    rawBody.user,
-    JSON.stringify({
-      iv: Buffer.from(iv).toString("hex"),
-      encryptedData: Buffer.from(encryptedData).toString("hex"),
-    })
-  );
-  return new Response(JSON.stringify({}), { headers: HEADERS });
 });
 
 const basicAuthentication = async (request: Request): Promise<User | null> => {
