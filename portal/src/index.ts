@@ -1,7 +1,5 @@
 import { Context, Hono } from "hono";
 import { cors } from "hono/cors";
-import bcrypt from "bcrypt";
-import crypto from "crypto";
 
 export interface Env {
   PORTAL: KVNamespace;
@@ -40,16 +38,24 @@ app.get("/portal", async (c: Context) => {
     if (data) {
       const iv = Buffer.from(data.iv, "hex");
       const encryptedData = Buffer.from(data.encryptedData, "hex");
-      const decipher = crypto.createDecipheriv(
-        "aes-256-gcm",
+      const key = await crypto.subtle.importKey(
+        "raw",
         Buffer.from(await c.env.PASSWORDS.get(userTry.user)),
-        iv
+        "AES-CBC",
+        true,
+        ["encrypt", "decrypt"]
       );
-      let decrypted = decipher.update(encryptedData);
-      decrypted = Buffer.concat([decrypted, decipher.final()]);
-      return new Response(JSON.stringify({ data: decrypted.toString() }), {
-        headers: HEADERS,
-      });
+      const decrypted = await crypto.subtle.decrypt(
+        { name: "AES-CBC", iv },
+        key,
+        encryptedData
+      );
+      return new Response(
+        JSON.stringify({ data: new TextDecoder("utf-8").decode(decrypted) }),
+        {
+          headers: HEADERS,
+        }
+      );
     } else {
       return new Response(JSON.stringify({ error: "No portal found." }), {
         status: 404,
@@ -81,23 +87,40 @@ app.post("/create", async (c: Context) => {
     );
   }
 
-  const passwordHash = bcrypt.hashSync(rawBody.password, 8);
-  await c.env.PASSWORDS.put(rawBody.user, passwordHash);
-
-  const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv(
-    "aes-256-gcm",
-    Buffer.from(passwordHash),
-    iv
+  const salt = crypto.getRandomValues(new Uint8Array(8));
+  const saltedHash = await crypto.subtle.digest(
+    "SHA-256",
+    Buffer.concat([Buffer.from(rawBody.password), Buffer.from(salt)])
   );
-  let encryptedData = cipher.update(rawBody.contents);
-  encryptedData = Buffer.concat([encryptedData, cipher.final()]);
+  const passwordHash = Buffer.concat([
+    Buffer.from(saltedHash),
+    Buffer.from(":"),
+    Buffer.from(salt),
+  ]);
+  await c.env.PASSWORDS.put(
+    rawBody.user,
+    Buffer.from(passwordHash).toString("hex")
+  );
+
+  const iv = crypto.getRandomValues(new Uint8Array(16));
+  const key = await crypto.subtle.importKey(
+    "raw",
+    Buffer.from(passwordHash),
+    "AES-CBC",
+    true,
+    ["encrypt", "decrypt"]
+  );
+  const encryptedData = await crypto.subtle.encrypt(
+    { name: "AES-CBC", iv },
+    key,
+    rawBody.contents
+  );
 
   await c.env.PORTAL.put(
     rawBody.user,
     JSON.stringify({
-      iv: iv.toString("hex"),
-      encryptedData: encryptedData.toString("hex"),
+      iv: Buffer.from(iv).toString("hex"),
+      encryptedData: Buffer.from(encryptedData).toString("hex"),
     })
   );
   return new Response(JSON.stringify({}), { headers: HEADERS });
@@ -141,7 +164,17 @@ const checkAuthentication = async (
   if (!hash) {
     return false;
   }
-  return await bcrypt.compare(user.password, hash);
+  const unHexedHash = Buffer.from(hash, "hex").toString();
+  const parts = unHexedHash.split(":");
+  if (parts.length < 2) {
+    return false;
+  }
+
+  const saltedHash = await crypto.subtle.digest(
+    "SHA-256",
+    Buffer.concat([Buffer.from(user.password), Buffer.from(parts[1])])
+  );
+  return Buffer.from(saltedHash) === Buffer.from(parts[0]);
 };
 
 export default app;
