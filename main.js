@@ -331,7 +331,7 @@ const loadPortal = () => {
   fetch("https://matter-portal.kewbish.workers.dev/portal", HEADERS)
     .then((res) => res.json())
     .then((jsn) => {
-      if (jsn.error) {
+      if (jsn.error && jsn.error === "No portal found.") {
         createPortal();
       } else {
         const values = JSON.parse(atob(jsn.data));

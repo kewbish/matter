@@ -29,49 +29,60 @@ app.options("*", (c) => {
 });
 
 app.get("/portal", async (c: Context) => {
-  const userTry = await basicAuthentication(c.req);
-  if (
-    c.req.headers.has("Authorization") &&
-    userTry &&
-    (await checkAuthentication(userTry, c.env.PASSWORDS))
-  ) {
-    const data = JSON.parse(await c.env.PORTAL.get(userTry.user));
-    if (data) {
-      const iv = Buffer.from(data.iv, "hex");
-      const encryptedData = Buffer.from(data.encryptedData, "hex");
-      const key = await crypto.subtle.importKey(
-        "raw",
-        Buffer.from(await c.env.PASSWORDS.get(userTry.user)),
-        "AES-CBC",
-        true,
-        ["encrypt", "decrypt"]
-      );
-      const decrypted = await crypto.subtle.decrypt(
-        { name: "AES-CBC", iv },
-        key,
-        encryptedData
-      );
-      return new Response(
-        JSON.stringify({ data: new TextDecoder("utf-8").decode(decrypted) }),
-        {
+  try {
+    const userTry = await basicAuthentication(c.req);
+    console.log(userTry);
+    if (c.req.headers.has("Authorization") && userTry) {
+      if (!(await checkAuthentication(userTry, c.env.PASSWORDS))) {
+        return new Response(JSON.stringify({ error: "Wrong credentials." }), {
+          status: 401,
           headers: HEADERS,
-        }
-      );
+        });
+      }
+
+      const data = JSON.parse(await c.env.PORTAL.get(userTry.user));
+      if (data) {
+        const iv = Buffer.from(data.iv, "hex");
+        const encryptedData = Buffer.from(data.encryptedData, "hex");
+        const key = await crypto.subtle.importKey(
+          "raw",
+          Buffer.from(await c.env.PASSWORDS.get(userTry.user)).subarray(0, 32),
+          "AES-CBC",
+          true,
+          ["encrypt", "decrypt"]
+        );
+        const decrypted = await crypto.subtle.decrypt(
+          { name: "AES-CBC", iv },
+          key,
+          encryptedData
+        );
+        return new Response(
+          JSON.stringify({ data: new TextDecoder("utf-8").decode(decrypted) }),
+          {
+            headers: HEADERS,
+          }
+        );
+      }
     } else {
       return new Response(JSON.stringify({ error: "No portal found." }), {
         status: 404,
         headers: HEADERS,
       });
     }
-  }
 
-  return new Response(JSON.stringify({ error: "Login required." }), {
-    status: 401,
-    headers: {
-      "WWW-Authenticate": 'Basic realm="Matter Portal login.", charset="UTF-8"',
-      ...HEADERS,
-    },
-  });
+    return new Response(JSON.stringify({ error: "Login required." }), {
+      status: 401,
+      headers: {
+        "WWW-Authenticate":
+          'Basic realm="Matter Portal login.", charset="UTF-8"',
+        ...HEADERS,
+      },
+    });
+  } catch (e: any) {
+    return new Response(JSON.stringify({ e: e.toString() }), {
+      headers: HEADERS,
+    });
+  }
 });
 
 app.post("/create", async (c: Context) => {
@@ -89,16 +100,10 @@ app.post("/create", async (c: Context) => {
       );
     }
 
-    const salt = crypto.getRandomValues(new Uint8Array(8));
-    const saltedHash = await crypto.subtle.digest(
+    const passwordHash = await crypto.subtle.digest(
       "SHA-256",
-      Buffer.concat([Buffer.from(rawBody.password), Buffer.from(salt)])
+      Buffer.from(rawBody.password)
     );
-    const passwordHash = Buffer.concat([
-      Buffer.from(saltedHash),
-      Buffer.from(":"),
-      Buffer.from(salt),
-    ]);
     await c.env.PASSWORDS.put(
       rawBody.user,
       Buffer.from(passwordHash).toString("hex")
@@ -107,7 +112,7 @@ app.post("/create", async (c: Context) => {
     const iv = crypto.getRandomValues(new Uint8Array(16));
     const key = await crypto.subtle.importKey(
       "raw",
-      Buffer.from(passwordHash),
+      Buffer.from(passwordHash).subarray(0, 32),
       "AES-CBC",
       true,
       ["encrypt", "decrypt"]
@@ -115,7 +120,7 @@ app.post("/create", async (c: Context) => {
     const encryptedData = await crypto.subtle.encrypt(
       { name: "AES-CBC", iv },
       key,
-      rawBody.contents
+      Buffer.from(rawBody.contents)
     );
 
     await c.env.PORTAL.put(
@@ -172,16 +177,15 @@ const checkAuthentication = async (
     return false;
   }
   const unHexedHash = Buffer.from(hash, "hex").toString();
-  const parts = unHexedHash.split(":");
-  if (parts.length < 2) {
-    return false;
-  }
 
   const saltedHash = await crypto.subtle.digest(
     "SHA-256",
-    Buffer.concat([Buffer.from(user.password), Buffer.from(parts[1])])
+    Buffer.from(user.password)
   );
-  return Buffer.from(saltedHash) === Buffer.from(parts[0]);
+
+  console.log(new TextDecoder("utf-8").decode(saltedHash), unHexedHash);
+
+  return new TextDecoder("utf-8").decode(saltedHash) === unHexedHash;
 };
 
 export default app;
