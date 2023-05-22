@@ -1,8 +1,11 @@
 import { Context, Hono } from "hono";
 import { cors } from "hono/cors";
+import bcrypt from "bcrypt";
+import crypto from "crypto";
 
 export interface Env {
   PORTAL: KVNamespace;
+  PASSWORDS: KVNamespace;
 }
 
 type User = { user: string; password: string };
@@ -28,11 +31,25 @@ app.options("*", (c) => {
 
 app.get("/portal", async (c: Context) => {
   const userTry = await basicAuthentication(c.req);
-  if (c.req.headers.has("Authorization") && userTry) {
-    // TODO: store based on hash of password instead and encrypt stored data with password
-    const data = await c.env.PORTAL.get(`${userTry.user}:${userTry.password}`);
+  if (
+    c.req.headers.has("Authorization") &&
+    userTry &&
+    (await checkAuthentication(userTry, c.env.PASSWORDS))
+  ) {
+    const data = JSON.parse(await c.env.PORTAL.get(userTry.user));
     if (data) {
-      return new Response(JSON.stringify({ data }), { headers: HEADERS });
+      const iv = Buffer.from(data.iv, "hex");
+      const encryptedData = Buffer.from(data.encryptedData, "hex");
+      const decipher = crypto.createDecipheriv(
+        "aes-256-gcm",
+        Buffer.from(await c.env.PASSWORDS.get(userTry.user)),
+        iv
+      );
+      let decrypted = decipher.update(encryptedData);
+      decrypted = Buffer.concat([decrypted, decipher.final()]);
+      return new Response(JSON.stringify({ data: decrypted.toString() }), {
+        headers: HEADERS,
+      });
     } else {
       return new Response(JSON.stringify({ error: "No portal found." }), {
         status: 404,
@@ -64,9 +81,24 @@ app.post("/create", async (c: Context) => {
     );
   }
 
+  const passwordHash = bcrypt.hashSync(rawBody.password, 8);
+  await c.env.PASSWORDS.put(rawBody.user, passwordHash);
+
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv(
+    "aes-256-gcm",
+    Buffer.from(passwordHash),
+    iv
+  );
+  let encryptedData = cipher.update(rawBody.contents);
+  encryptedData = Buffer.concat([encryptedData, cipher.final()]);
+
   await c.env.PORTAL.put(
-    `${rawBody.user}:${rawBody.password}`,
-    rawBody.contents
+    rawBody.user,
+    JSON.stringify({
+      iv: iv.toString("hex"),
+      encryptedData: encryptedData.toString("hex"),
+    })
   );
   return new Response(JSON.stringify({}), { headers: HEADERS });
 });
@@ -99,6 +131,17 @@ const basicAuthentication = async (request: Request): Promise<User | null> => {
     user: decoded.substring(0, index),
     password: decoded.substring(index + 1),
   };
+};
+
+const checkAuthentication = async (
+  user: User,
+  namespace: KVNamespace
+): Promise<boolean> => {
+  const hash = await namespace.get(user.user);
+  if (!hash) {
+    return false;
+  }
+  return await bcrypt.compare(user.password, hash);
 };
 
 export default app;
