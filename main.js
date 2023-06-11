@@ -331,7 +331,7 @@ const loadPortal = () => {
   fetch("https://matter-portal.kewbish.workers.dev/portal", HEADERS)
     .then((res) => res.json())
     .then((jsn) => {
-      if (jsn.error && jsn.error === "No portal found.") {
+      if (jsn.error) {
         createPortal();
       } else {
         const values = JSON.parse(atob(jsn.data));
@@ -339,6 +339,8 @@ const loadPortal = () => {
         setLoc("isnum", values.isnum);
         setLoc("pat", values.pat);
         setLoc("repo", values.repo);
+        document.getElementById("repo").value = values.repo;
+        document.getElementById("isnum").value = values.isnum;
         upLoc();
         setup();
         getBm();

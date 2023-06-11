@@ -12,6 +12,7 @@ type User = { user: string; password: string };
 const app = new Hono();
 
 const HEADERS = { "Access-Control-Allow-Origin": "*" };
+const SALT = "Matter Portal Salt!";
 
 app.use(
   "*",
@@ -31,7 +32,6 @@ app.options("*", (c) => {
 app.get("/portal", async (c: Context) => {
   try {
     const userTry = await basicAuthentication(c.req);
-    console.log(userTry);
     if (c.req.headers.has("Authorization") && userTry) {
       if (!(await checkAuthentication(userTry, c.env.PASSWORDS))) {
         return new Response(JSON.stringify({ error: "Wrong credentials." }), {
@@ -44,10 +44,22 @@ app.get("/portal", async (c: Context) => {
       if (data) {
         const iv = Buffer.from(data.iv, "hex");
         const encryptedData = Buffer.from(data.encryptedData, "hex");
-        const key = await crypto.subtle.importKey(
+        const baseKey = await crypto.subtle.importKey(
           "raw",
-          Buffer.from(await c.env.PASSWORDS.get(userTry.user)).subarray(0, 32),
-          "AES-CBC",
+          stoab(userTry.password),
+          { name: "PBKDF2" },
+          false,
+          ["deriveKey"]
+        );
+        const key = await crypto.subtle.deriveKey(
+          {
+            name: "PBKDF2",
+            salt: stoab(SALT),
+            iterations: 100,
+            hash: "SHA-256",
+          },
+          baseKey,
+          { name: "AES-CBC", length: 128 },
           true,
           ["encrypt", "decrypt"]
         );
@@ -110,17 +122,29 @@ app.post("/create", async (c: Context) => {
     );
 
     const iv = crypto.getRandomValues(new Uint8Array(16));
-    const key = await crypto.subtle.importKey(
+    const baseKey = await crypto.subtle.importKey(
       "raw",
-      Buffer.from(passwordHash).subarray(0, 32),
-      "AES-CBC",
+      stoab(rawBody.password),
+      { name: "PBKDF2" },
+      false,
+      ["deriveKey"]
+    );
+    const key = await crypto.subtle.deriveKey(
+      {
+        name: "PBKDF2",
+        salt: stoab(SALT),
+        iterations: 100,
+        hash: "SHA-256",
+      },
+      baseKey,
+      { name: "AES-CBC", length: 128 },
       true,
       ["encrypt", "decrypt"]
     );
     const encryptedData = await crypto.subtle.encrypt(
       { name: "AES-CBC", iv },
       key,
-      Buffer.from(rawBody.contents)
+      stoab(rawBody.contents)
     );
 
     await c.env.PORTAL.put(
@@ -183,9 +207,12 @@ const checkAuthentication = async (
     Buffer.from(user.password)
   );
 
-  console.log(new TextDecoder("utf-8").decode(saltedHash), unHexedHash);
-
   return new TextDecoder("utf-8").decode(saltedHash) === unHexedHash;
+};
+
+const stoab = (str: string) => {
+  var encoder = new TextEncoder();
+  return encoder.encode(str);
 };
 
 export default app;

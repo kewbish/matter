@@ -1,8 +1,8 @@
 name = "matter-portal"
 main = "src/index.ts"
-compatibility_date = "2023-05-22"
+compatibility_date = "2023-05-18"
 kv_namespaces= [
-    { binding = "PORTAL", id = "c542409476474284be9eff192bb38093" },
-    { binding = "PASSWORDS", id = "9366332e68fc4be9ac329a867901fdbd" }
+    { binding = "PORTAL", id = "c542409476474284be9eff192bb38093", preview_id = "4a7c393b5f6445e48616ca39faf1297c" },
+    { binding = "PASSWORDS", id = "9366332e68fc4be9ac329a867901fdbd", preview_id = "11ad05eb08cd4a629322134d4683355f" }
 ]
 compatibility_flags = [ "nodejs_compat" ]
